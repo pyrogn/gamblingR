@@ -21,6 +21,8 @@ pull_bandit = function(price, p_distr) {
 
 prices = seq(5, 20) * 2
 n_bandits = length(prices)
+p_distrs = replicate(n_bandits, losing_p_distr, simplify = FALSE)
+p_distrs[[sample(1:n_bandits, 1)]] = winning_p_distr
 
 # estimation experiments ---------------------------------------------
 sum(replicate(1000, pull_bandit(10, losing_p_distr))) / 1000
@@ -34,10 +36,29 @@ t.test(
 
 # player --------------------------------------------------------------
 
+myZip = function(l1, l2) transpose(list(l1, l2))
+
 cash = 100
 bandit_results = list()
 # bandit_estimations = list?
+ll = myZip(as.list(prices), p_distrs)
+# some strategy
+for (j in seq_along(ll)) {
+  i = ll[[j]]
+  res = replicate(1000, pull_bandit(i[[1]], i[[2]]))
+  bandit_results[[j]] = res
+}
+# we can reuse old t statistics (in jupyterlite)
+p_vals = sapply(
+  myZip(as.list(prices), bandit_results),
+  \(x) t.test(x[[2]], mu=x[[1]], alternative='greater')$p.value
+  )
 
+# which is the best
+which.min(p_vals)
+
+
+# write strategy based on Bayesian statistics
 
 # strategies ----------------------------------------------------------
 
