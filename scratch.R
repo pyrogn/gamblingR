@@ -138,15 +138,39 @@ plot_left_on_step = function(detail_wins) {
   data_df = tibble(y=data_reduced+cash) |> mutate(x=row_number())
   ggplot(data=data_df, aes(x=x, y=y)) +
     geom_line()
-}
-plot_left_on_step(bandit_results)
+
+  }
+# plot_left_on_step(bandit_results)
 # add ghost individual lines, would be good,
 # need to think how to convert list of vectors to tibble
+
+strategy1 = function() {
+  # results = vector('list', length = n_bandits)
+  results = map(1:n_bandits, ~ 10) # avoiding NULLs
+  # likely I need it to change to sum, not results on every machine, no?
+
+  make_step = function() {
+    last_elems = map(results, ~tail(.x, 4)) # ineffective
+    probs_bandit_to_play = exp(last_elems) / sum(exp(last_elems))
+    index_choice = sample(
+      1:n_bandits, size=1, prob=probs_bandit_to_play
+    )
+    result = pull_bandit_player(index_choice)
+    results[[index_choice]] <<- results[[index_choice]] + result
+  }
+  results
+}
+
+run_strategy_one_iter = function(strategy_func) {
+  strategy_func
+}
 
 # strategies ----------------------------------------------------------
 
 cash = 100
-bandit_results = list()
+bandit_results = list() # should be local?
+iters = 100
+steps = 1000
 
 # random play
 
@@ -163,5 +187,4 @@ for (iter in 1:100){
 # write strategy based on Bayesian statistics
 
 # visualization -------------------------------------------------------
-
 
