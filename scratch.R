@@ -11,7 +11,7 @@ library(tidyverse)
 
 scale_p_distr <- function(vec) vec / sum(vec) # sum(vec) == 1
 
-winning_p_distr <- c(4, 1.5, 2, 2.5, .13, .05) |>
+winning_p_distr <- c(4, 1.5, 5, 2.5, 0.13, .05) |>
   scale_p_distr()
 
 losing_p_distr <- c(5, 2, 2, 1, .1, .03) |>
@@ -19,10 +19,10 @@ losing_p_distr <- c(5, 2, 2, 1, .1, .03) |>
 
 price <- 10
 cash <- 1000
-n_bandits <- 20 # constant
+n_bandits <- 5 # constant
 
 n_steps <- 1000 # constant
-n_iters <- 100 # constant
+n_iters <- 50 # constant
 
 winning_sizes <- c(
   0, price %/% 2, price, price * 2, price * 10, price * 100
@@ -111,14 +111,14 @@ GameEnvironment <- R6Class("GameEnvironment",
         is_change <- sample(0:1, size = 1, prob = c(1 - p, p))
 
         if (is_change) {
-          print(p)
-          # self$winner <- get_winning_bandit(self$winner)
-          # self$p_distrs <- get_distrs(self$winner)
-          # self$history_prizes <- vector("numeric", length = n_bandits)
-          # self$changes <- append(
-          #   self$changes, list(c(self$winner, self$n))
-          # )
-          # self$last_change <- 0
+          # print(p)
+          self$winner <- get_winning_bandit(self$winner)
+          self$p_distrs <- get_distrs(self$winner)
+          self$history_prizes <- vector("numeric", length = n_bandits)
+          self$changes <- append(
+            self$changes, list(c(self$winner, self$n))
+          )
+          self$last_change <- 0
         }
       }
     }
@@ -185,8 +185,7 @@ strategy1 <- function() {
   engine
 }
 
-# play where more expectancy to win
-
+# play where max avg mean of winnings
 strategy2 <- function() {
   last_winnings <- map(1:n_bandits, ~ deque(rep(price, 50)))
   engine <- function(func) {
@@ -203,14 +202,55 @@ strategy2 <- function() {
   }
   engine
 }
-# different alpha in t statistics
+
+# maybe add different alpha in t statistics
+# t stat
+strategy3 <- function() {
+  get_lower_boundary <- function(x) {
+    t.test(x, mu = price, alternative = "greater")$conf.int[[1]]
+  }
+
+  lower_boundaries <- rep(9.8, n_bandits)
+
+  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2)))
+
+  engine <- function(func) {
+    avg_mean <- map_dbl(
+      map(last_winnings, ~ .x$as_list() |> unlist()),
+      mean
+    )
+    p <- 2.7^(lower_boundaries) / sum(2.7^(lower_boundaries))
+    if (sample(0:1, size = 1) == 1) {
+      to_pull <- sample(1:n_bandits, size = 1)
+    } else {
+      to_pull <- sample(1:n_bandits, p = p, size = 1)
+    }
+    # to_pull <- which.max(lower_boundaries)
+    result <- func(to_pull)
+
+    last_winnings[[to_pull]]$push(result)
+    if (last_winnings[[to_pull]]$size() > 50) {
+      last_winnings[[to_pull]]$popleft()
+    }
+    lower_boundaries[[to_pull]] <<- last_winnings[[to_pull]]$as_list() |>
+      unlist() |>
+      get_lower_boundary()
+  }
+  engine
+}
+
 # write strategy based on Bayesian statistics
 
 # plays generation ---------------------------------------------------
+# g <- GameEnvironment$new(n_steps)
+# str1 <- strategy3()
+# pull_ <- init_pull_bandit_player(g)
+# walk(1:10, ~ str1(pull_))
 
-it1 <- run_iter(strategy2)
+# it1 <- run_iter(strategy3)
+# I feel uneasy that strategy can call pull more than once per step
 
-it100 <- repeate_iters(strategy2)
+it100 <- repeate_iters(strategy3)
 
 r1 <- get_rewards_simulations(it100)
 
