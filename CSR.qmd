@@ -1,0 +1,40 @@
+---
+title: "CSR"
+author: "Pavel"
+format: html
+editor: visual
+---
+
+## CSR (Casino Strategies Report) 2024
+
+Top-1 Gambling Journal according to International Casino Journals Committee
+
+![](pics/ocean.jpeg){fig-align="center" width="300"}
+
+## Solution Specifics
+
+1.  Code While You Can (functional code where is possible)
+2.  Game simulation and data management
+3.  Создание разных стратегий для игр
+4.  Получение достоверных результатов эффективности стратегий по Low of Large Numbers.
+
+## Casino Rules
+
+1.  There are N machines
+2.  Из них N-1 имеют матожидание выигрыша ниже цены игры
+3.  1 позволяет получить достоверную прибыль in the long term
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).

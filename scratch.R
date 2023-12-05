@@ -225,7 +225,6 @@ strategy3 <- function() {
     } else {
       to_pull <- sample(1:n_bandits, p = p, size = 1)
     }
-    # to_pull <- which.max(lower_boundaries)
     result <- func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
