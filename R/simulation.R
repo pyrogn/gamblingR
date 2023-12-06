@@ -17,12 +17,13 @@ winning_p_distr <- c(4, 1.5, 5, 2.5, 0.13, .05) |>
 losing_p_distr <- c(5, 2, 2, 1, .1, .03) |>
   scale_p_distr()
 
+# constants
 price <- 10
 cash <- 1000
-n_bandits <- 5 # constant
+n_bandits <- 5
 
-n_steps <- 1000 # constant
-n_iters <- 50 # constant
+n_steps <- 1000
+n_iters <- 50
 
 winning_sizes <- c(
   0, price %/% 2, price, price * 2, price * 10, price * 100
@@ -56,6 +57,11 @@ sigmoid <- function(x, c1, c2) {
 }
 
 sigmoid_paramed <- \(x) sigmoid(x, c1 = .001, c2 = 5000)
+softmax <- function(x) {
+  e <- 2.71828
+  x_exp <- e^(x)
+  x_exp / sum(x_exp)
+}
 
 
 # class with Gaming environment --------------------------------------
@@ -89,7 +95,7 @@ GameEnvironment <- R6Class("GameEnvironment",
 
       self$indices[[self$n]] <- index
       self$rewards[[self$n]] <- reward
-      self$n <- self$n + 1
+      self$n <- self$n + 1 # maybe check for n <= n_steps
 
       private$update_machines()
       self$history_prizes[[index]] <- self$history_prizes[[index]] +
@@ -152,29 +158,10 @@ get_rewards_simulations <- function(results) {
 }
 
 
-# estimation experiments ---------------------------------------------
-# sum(replicate(1000, pull_bandit(10, losing_p_distr))) / 1000
-#
-# t.test(
-#   replicate(1000, pull_bandit(10, winning_p_distr)),
-#   mu=10,
-#   alternative='greater'
-#   )
-
-# player --------------------------------------------------------------
-
-
-
-# # we can reuse old t statistics (in jupyterlite)
-# p_vals = sapply(
-#   bandit_results,
-#   \(x) t.test(x, mu=price, alternative='greater')$p.value
-#   )
-
-# which is the best
-
 # strategies ----------------------------------------------------------
 
+# they might be classes
+# and they will be validated to enforce structure
 
 # random play
 
@@ -212,9 +199,10 @@ strategy3 <- function() {
 
   lower_boundaries <- rep(9.8, n_bandits)
 
-  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2)))
+  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2))) # var != 0
+  max_history <- 50
 
-  engine <- function(func) {
+  engine <- function(pull_func) {
     avg_mean <- map_dbl(
       map(last_winnings, ~ .x$as_list() |> unlist()),
       mean
@@ -225,10 +213,10 @@ strategy3 <- function() {
     } else {
       to_pull <- sample(1:n_bandits, p = p, size = 1)
     }
-    result <- func(to_pull)
+    result <- pull_func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
-    if (last_winnings[[to_pull]]$size() > 50) {
+    if (last_winnings[[to_pull]]$size() > max_history) {
       last_winnings[[to_pull]]$popleft()
     }
     lower_boundaries[[to_pull]] <<- last_winnings[[to_pull]]$as_list() |>
@@ -283,3 +271,13 @@ plot_left_on_step(r1)
 # add ghost individual lines, would be good,
 # need to think how to convert list of vectors to tibble
 # (using explode maybe)
+
+
+# data export ------------------------------------------------------
+
+# example
+write_rds(it100, file = "data/s1.RData", compress = "gz")
+saveRDS(r1, file = "data/s1.RData")
+
+# read it back
+# r2 = read_rds("data/s1.RData")
