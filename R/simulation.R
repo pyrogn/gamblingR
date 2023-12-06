@@ -180,7 +180,7 @@ strategy2 <- function() {
       map(last_winnings, ~ .x$as_list() |> unlist()),
       mean
     )
-    print(avg_mean)
+    # print(avg_mean)
     to_pull <- which.max(avg_mean)
     result <- func(to_pull)
 
@@ -207,10 +207,10 @@ strategy3 <- function() {
       map(last_winnings, ~ .x$as_list() |> unlist()),
       mean
     )
-    p <- 2.7^(lower_boundaries) / sum(2.7^(lower_boundaries))
-    if (sample(0:1, size = 1) == 1) {
+    p <- lower_boundaries |> softmax()
+    if (sample(0:1, size = 1) == 1) { # random strategy
       to_pull <- sample(1:n_bandits, size = 1)
-    } else {
+    } else { # intelligent strategy
       to_pull <- sample(1:n_bandits, p = p, size = 1)
     }
     result <- pull_func(to_pull)
@@ -229,6 +229,9 @@ strategy3 <- function() {
 # write strategy based on Bayesian statistics
 
 # plays generation ---------------------------------------------------
+
+# for debug purposes:
+
 # g <- GameEnvironment$new(n_steps)
 # str1 <- strategy3()
 # pull_ <- init_pull_bandit_player(g)
@@ -237,9 +240,9 @@ strategy3 <- function() {
 # it1 <- run_iter(strategy3)
 # I feel uneasy that strategy can call pull more than once per step
 
-it100 <- repeate_iters(strategy3)
-
-r1 <- get_rewards_simulations(it100)
+# it100 <- repeate_iters(strategy3)
+#
+# r1 <- get_rewards_simulations(it100)
 
 
 # visualization -------------------------------------------------------
@@ -252,7 +255,7 @@ plot_end_cash <- function(cash_left) {
   ggplot(data = data, aes(x = x)) +
     geom_histogram(color = "black", fill = "white")
 }
-plot_end_cash(r1)
+# plot_end_cash(r1)
 
 
 # Остаток на балансе в ходе игры
@@ -267,7 +270,7 @@ plot_left_on_step <- function(detail_wins) {
   ggplot(data = data_df, aes(x = x, y = y)) +
     geom_line()
 }
-plot_left_on_step(r1)
+# plot_left_on_step(r1)
 # add ghost individual lines, would be good,
 # need to think how to convert list of vectors to tibble
 # (using explode maybe)
@@ -275,9 +278,20 @@ plot_left_on_step(r1)
 
 # data export ------------------------------------------------------
 
-# example
-write_rds(it100, file = "data/s1.RData", compress = "gz")
-saveRDS(r1, file = "data/s1.RData")
+strategies <- c(
+  strategy1,
+  strategy2,
+  strategy3
+)
+
+iterations_from_strategies <- map(strategies, repeate_iters)
+
+name_strategy <- function(x) paste0("data/s", x, ".RData")
+
+iwalk(
+  iterations_from_strategies,
+  ~ write_rds(.x, name_strategy(.y), compress = "gz")
+)
 
 # read it back
 # r2 = read_rds("data/s1.RData")
