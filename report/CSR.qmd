@@ -5,6 +5,13 @@ format: html
 editor: visual
 ---
 
+```{r}
+library(tidyverse)
+source("../R/constants.R")
+```
+
+
+
 ## CSR (Casino Strategies Report) 2024
 
 Top-1 Gambling Journal according to International Casino Journals Committee
@@ -13,10 +20,11 @@ Top-1 Gambling Journal according to International Casino Journals Committee
 
 ## Solution Specifics
 
-1.  Code While You Can (functional code where is possible)
-2.  Game simulation and data management
-3.  Создание разных стратегий для игр
-4.  Получение достоверных результатов эффективности стратегий по Low of Large Numbers.
+1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible)
+2.  Game simulation and **data management**
+3.  Creating different playing strategies using \[un\]common sense and **statistics**.
+4.  Getting proven results by Low of Large Numbers.
+5.  **Data Visualization**
 
 ## Casino Rules
 
@@ -24,12 +32,24 @@ Top-1 Gambling Journal according to International Casino Journals Committee
 2.  Из них N-1 имеют матожидание выигрыша ниже цены игры
 3.  1 позволяет получить достоверную прибыль in the long term
 
+| Col1 | Col2 | Col3 |
+|------|------|------|
+|      |      |      |
+|      |      |      |
+|      |      |      |
+
+: hello
+
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
 1 + 1
+knitr::kable(head(iris),format = "html")
+knitr::kable(tibble(winning_sizes, winning_p_distr, losing_p_distr),format = "html")
+(winning_p_distr * winning_sizes) |> sum()
+(losing_p_distr * winning_sizes) |> sum()
 ```
-
+123123 `r (losing_p_distr * winning_sizes) |> sum() |> round(2)`
 You can add options to executable code like this
 
 ```{r}
