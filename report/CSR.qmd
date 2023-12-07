@@ -22,7 +22,7 @@ Top-1 Gambling Journal according to International Casino Journals Committee
 1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible).
 2.  Game simulation and **data management**.
 3.  Creating different gaming strategies using \[un\]common sense and **statistics**.
-4.  Finding best strategy backed by Low of Large Numbers.
+4.  Finding best strategy backed by statistics.
 5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
 
 ## Casino Rules
@@ -51,8 +51,6 @@ plot(1:10000, (\\(x) sigmoid_paramed(x) )(1:10000))
 3.  T shaped man
 4.  Biased Bayes
 5.  Anything else?
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
 #| echo: false

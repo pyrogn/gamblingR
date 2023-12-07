@@ -2,6 +2,7 @@ styler:::style_active_file()
 
 library(tidyverse)
 library(ggridges)
+library(slider)
 source("R/constants.R")
 
 # import data ----------------------------------------------
@@ -103,6 +104,29 @@ n_bankrupt_at_step |>
 
 
 # Про индексы и специфику выбора
-# sim_data[[3]][[1]]$changes
 
-# Процент использования нужной машины до смены
+
+# создание датафрейма с индексом и шагом (уфффф...--0[_32][}{}])
+sim_data[[3]][[1]]$changes |>
+  transpose() |>
+  map(unlist) |>
+  as_tibble(.name_repair = "unique") |>
+  rename(index = ...1, step_n = ...2) |>
+  mutate(to = lead(step_n - 1, default = n_steps, order_by = step_n)) |>
+  rowwise() |>
+  mutate(step_n = list(seq(step_n, to))) |>
+  unnest(step_n) |>
+  select(index, step_n)
+
+sim_data[[3]][[1]]$ind |> unlist() |>
+  as_tibble() |>
+  mutate(step_n = row_number()) |>
+  rename(index = value) |>
+  mutate(is_target = as.numeric(index == 9)) |>
+  mutate(
+    moving_avg = slider::slide_dbl(is_target, mean, .before = 10, after=10)
+    )
+
+# make inner join and use target index from 1 table
+
+# Процент использования нужной машины до смены и после смены
