@@ -17,6 +17,9 @@ source("R/constants.R")
 # 3. Add validators for strategies
 # 4. Pass somehow names of strategies to plots.R
 
+# Поработать над стратегиями
+# Правильно ли я понимаю, как работает deque? pop or popleft?
+
 # basic functions --------------------------------------------------
 
 pull_bandit <- function(p_distr) { # random
@@ -160,7 +163,7 @@ strategy1 <- function() {
 
 # play where max avg mean of winnings
 strategy2 <- function() {
-  last_winnings <- map(1:n_bandits, ~ deque(rep(price, 50)))
+  last_winnings <- map(1:n_bandits, ~ deque(rep(price, 100)))
   engine <- function(func) {
     avg_mean <- map_dbl(
       map(last_winnings, ~ .x$as_list() |> unlist()),
@@ -171,7 +174,7 @@ strategy2 <- function() {
     result <- func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
-    last_winnings[[to_pull]]$popleft()
+    last_winnings[[to_pull]]$pop()
   }
   engine
 }
@@ -194,7 +197,7 @@ strategy3 <- function() {
       mean
     )
     p <- lower_boundaries |> softmax()
-    if (sample(0:1, size = 1) == 1) { # random strategy
+    if (sample(1:4, size = 1) == 1) { # random strategy
       to_pull <- sample(1:n_bandits, size = 1)
     } else { # intelligent strategy
       to_pull <- sample(1:n_bandits, p = p, size = 1)
@@ -203,7 +206,7 @@ strategy3 <- function() {
 
     last_winnings[[to_pull]]$push(result)
     if (last_winnings[[to_pull]]$size() > max_history) {
-      last_winnings[[to_pull]]$popleft()
+      last_winnings[[to_pull]]$pop()
     }
     lower_boundaries[[to_pull]] <<- last_winnings[[to_pull]]$as_list() |>
       unlist() |>
@@ -211,6 +214,40 @@ strategy3 <- function() {
   }
   engine
 }
+
+# sequential player
+strategy4 <- function() {
+  get_higher_boundary <- function(x) {
+    t.test(x, mu = price)$conf.int[[2]]
+  }
+
+  higher_boundaries <- rep(9.8, n_bandits)
+
+  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2))) # var != 0
+  max_history <- 50
+  to_pull <- 1
+
+  engine <- function(pull_func) {
+    result <- pull_func(to_pull)
+
+    last_winnings[[to_pull]]$push(result)
+    if (last_winnings[[to_pull]]$size() > max_history) {
+      last_winnings[[to_pull]]$pop()
+    }
+
+    higher_boundaries[[to_pull]] <<- last_winnings[[
+      to_pull
+    ]]$as_list() |>
+      unlist() |>
+      get_higher_boundary()
+
+    if (higher_boundaries[[to_pull]] < price) {
+      to_pull <<- (to_pull) %% n_bandits + 1
+    }
+  }
+  engine
+}
+
 
 # write strategy based on Bayesian statistics
 
@@ -223,10 +260,10 @@ strategy3 <- function() {
 # pull_ <- init_pull_bandit_player(g)
 # walk(1:10, ~ str1(pull_))
 
-# it1 <- run_iter(strategy3)
+# it1 <- run_iter(strategy4)
 # I feel uneasy that strategy can call pull more than once per step
 
-# it100 <- repeate_iters(strategy3)
+# it100 <- repeate_iters(strategy4)
 #
 # r1 <- get_rewards_simulations(it100)
 
@@ -236,9 +273,10 @@ strategy3 <- function() {
 strategies <- c(
   strategy1,
   strategy2,
-  strategy3
+  strategy3,
+  strategy4
 )
-strategy_names <- c("Random", "s2", "s3")
+strategy_names <- c("Random", "s2", "s3", "s4")
 
 iterations_from_strategies <- map(strategies, repeate_iters)
 
@@ -246,6 +284,3 @@ iwalk(
   iterations_from_strategies,
   ~ write_rds(.x, name_strategy(.y), compress = "gz")
 )
-
-# read it back
-# r2 = read_rds("data/s1.RData")

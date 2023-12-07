@@ -1,4 +1,4 @@
-styler:::style_active_file()
+# styler:::style_active_file()
 
 
 price <- 10 # price of one game
@@ -8,8 +8,8 @@ n_bandits <- 10 # total number of machines
 # change distribution after this number of games
 n_games_change_p <- 500
 
-n_steps <- 3000 # steps in one simulation with one strategy
-n_iters <- 500 # iterations for evaluating one strategy
+n_steps <- 1000 # steps in one simulation with one strategy
+n_iters <- 50 # iterations for evaluating one strategy
 
 # nicer table is in qmd file
 scale_p_distr <- function(vec) vec / sum(vec) # sum(vec) == 1

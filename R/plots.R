@@ -7,12 +7,16 @@ source("R/constants.R")
 
 # import data ----------------------------------------------
 
-sim_data <- map(1:3, ~ read_rds(name_strategy(.x)))
+sim_data <- map(1:4, ~ read_rds(name_strategy(.x)))
 
 # helpers----------------------------------------------
 
-get_rewards_simulations <- function(results) {
-  map(results, ~ .x$rewards |> unlist())
+get_attr_data <- function(data, attribute) {
+  map(data, ~ .x[[attribute]] |> unlist())
+}
+
+get_rewards_simulations <- function(data) {
+  get_attr_data(data, "rewards")
 }
 
 sim_rewards <- map(sim_data, get_rewards_simulations)
@@ -107,26 +111,64 @@ n_bankrupt_at_step |>
 
 
 # создание датафрейма с индексом и шагом (уфффф...--0[_32][}{}])
-sim_data[[3]][[1]]$changes |>
-  transpose() |>
-  map(unlist) |>
-  as_tibble(.name_repair = "unique") |>
-  rename(index = ...1, step_n = ...2) |>
-  mutate(to = lead(step_n - 1, default = n_steps, order_by = step_n)) |>
-  rowwise() |>
-  mutate(step_n = list(seq(step_n, to))) |>
-  unnest(step_n) |>
-  select(index, step_n)
+get_hits_on_position <- function(data) {
+  history_changes <- data$changes |>
+    transpose() |>
+    map(unlist) |>
+    as_tibble(.name_repair = "unique") |>
+    rename(index = ...1, from = ...2) |>
+    mutate(to = lead(from - 1, default = n_steps, order_by = from) |>
+      as.integer()) |>
+    rowwise() |>
+    mutate(step_n = list(seq(from, to))) |>
+    unnest(step_n) |>
+    mutate(
+      is_change = step_n == from,
+      pos_lookup = step_n - from + 1,
+      neg_lookup = step_n - to - 1
+    ) |>
+    rowwise() |>
+    mutate(
+      rel_position = if_else(
+        pos_lookup < -neg_lookup, pos_lookup, neg_lookup
+      )
+    ) |>
+    ungroup() |>
+    mutate(position_look = if_else(
+      abs(rel_position) < 300, rel_position, NA
+    )) |>
+    select(index, step_n, position_look)
 
-sim_data[[3]][[1]]$ind |> unlist() |>
-  as_tibble() |>
-  mutate(step_n = row_number()) |>
-  rename(index = value) |>
-  mutate(is_target = as.numeric(index == 9)) |>
-  mutate(
-    moving_avg = slider::slide_dbl(is_target, mean, .before = 10, after=10)
-    )
+
+  choice_at_step <- sim_data[[3]][[1]]$ind |>
+    unlist() |>
+    as_tibble() |>
+    mutate(step_n = row_number()) |>
+    rename(choice = value)
+
+  res <- history_changes |>
+    inner_join(choice_at_step, by = "step_n") |>
+    mutate(is_target = as.numeric(index == choice)) |>
+    filter(!is.na(position_look)) |>
+    group_by(position_look) |>
+    summarise(n = n(), target_hit = sum(is_target))
+  res
+}
+
+
+
+
+
+# mutate( # might not use rolling average
+#   moving_avg = slide_dbl(is_target, mean, .before = 10, after = 10)
+# )
+
+
 
 # make inner join and use target index from 1 table
+# add column - steps to change: -3,-2,-1,0,1,2,3... Some may be NA
+# map to many iterations (HOW?)
+# group by delta, summarize mean
+# plot it as lineplot probably. Or maybe something with CI.
 
 # Процент использования нужной машины до смены и после смены

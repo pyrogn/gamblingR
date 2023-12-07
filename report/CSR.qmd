@@ -8,6 +8,8 @@ editor: visual
 ```{r}
 #| include: false
 library(tidyverse)
+library(kableExtra)
+library(knitr)
 source("../R/constants.R")
 ```
 
@@ -20,24 +22,40 @@ Top-1 Gambling Journal according to International Casino Journals Committee
 ## Solution Specifics
 
 1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible).
-2.  Game simulation and **data management**.
+2.  Game simulation and **data wrangling**.
 3.  Creating different gaming strategies using \[un\]common sense and **statistics**.
 4.  Finding best strategy backed by statistics.
 5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
+6.  **Results presentations** with Quarto (next gen RMarkdown).
 
 ## Casino Rules
 
 1.  There are `r n_bandits` machines
 2.  Из них `r n_bandits-1` имеют матожидание выигрыша ниже цены игры
 3.  1 позволяет получить достоверную прибыль in the long run
-4.  Winning machine might be changed after 200 winnings in this machine to prevent exploit.
+4.  Winning machine might be changed after `r n_games_change_p` winnings in this machine to prevent exploit.
 
 ## Basic statistics
 
 Insert expected values of winnings
 
-Add plot of sigmoid
-plot(1:10000, (\\(x) sigmoid_paramed(x) )(1:10000))
+Add plot of sigmoid plot(1:10000, (\\(x) sigmoid_paramed(x) )(1:10000))
+
+```{r}
+#| include: false
+exp_losing <- sum(losing_p_distr * winning_sizes)
+exp_winning <- sum(winning_p_distr * winning_sizes)
+p_losing <- (n_bandits - 1) / n_bandits
+p_winning <- 1 / n_bandits
+avg_win = p_losing * exp_losing + p_winning * exp_winning
+```
+
+-   Всего машин: `r n_bandits`. 
+-   Цена игры: `r price`. 
+-   У проигрышных машин матожидание выигрыша `r exp_losing |> round(2)`.
+-   У выигрышной машины матожидание выигрыша `r exp_winning |> round(2)`.
+-   При рандомной стратегии матожидание выигрыша: `r avg_win |> round(2)`.
+-   При других стратегиях... Не так все просто, но симуляциями можем оценить! (найти, сделать)
 
 ## Simulation rules
 
@@ -52,11 +70,13 @@ plot(1:10000, (\\(x) sigmoid_paramed(x) )(1:10000))
 4.  Biased Bayes
 5.  Anything else?
 
+
+
 ```{r}
 #| echo: false
 1 + 1
 knitr::kable(head(iris),format = "html")
-knitr::kable(tibble(winning_sizes, winning_p_distr, losing_p_distr),format = "html")
+knitr::kable(tibble(winning_sizes, winning_p_distr, losing_p_distr),format = "html") |> kable_styling()
 (winning_p_distr * winning_sizes) |> sum()
 (losing_p_distr * winning_sizes) |> sum()
 ```
@@ -71,6 +91,17 @@ knitr::kable(tibble(winning_sizes, winning_p_distr, losing_p_distr),format = "ht
 The `echo: false` option disables the printing of code (only output is displayed).
 
 ## Visualization of strategies
+
+Вставить графики из plots.R
+```{r}
+#| echo: false
+1+1
+```
+
+
+## Best strategy
+
+Оценить матожидание
 
 ## Conclusions
 

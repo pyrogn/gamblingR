@@ -35,6 +35,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="CSR_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="CSR_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+<script src="CSR_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="CSR_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 
 </head>
 
@@ -80,25 +83,34 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="solution-specifics">Solution Specifics</h2>
 <ol type="1">
 <li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible).</li>
-<li>Game simulation and <strong>data management</strong>.</li>
+<li>Game simulation and <strong>data wrangling</strong>.</li>
 <li>Creating different gaming strategies using [un]common sense and <strong>statistics</strong>.</li>
-<li>Finding best strategy backed by Low of Large Numbers.</li>
+<li>Finding best strategy backed by statistics.</li>
 <li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
+<li><strong>Results presentations</strong> with Quarto (next gen RMarkdown).</li>
 </ol>
 </section>
 <section id="casino-rules" class="level2">
 <h2 class="anchored" data-anchor-id="casino-rules">Casino Rules</h2>
 <ol type="1">
-<li>There are 5 machines</li>
-<li>Из них 4 имеют матожидание выигрыша ниже цены игры</li>
+<li>There are 10 machines</li>
+<li>Из них 9 имеют матожидание выигрыша ниже цены игры</li>
 <li>1 позволяет получить достоверную прибыль in the long run</li>
-<li>Winning machine might be changed after 200 winnings in this machine to prevent exploit.</li>
+<li>Winning machine might be changed after 500 winnings in this machine to prevent exploit.</li>
 </ol>
 </section>
 <section id="basic-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="basic-statistics">Basic statistics</h2>
 <p>Insert expected values of winnings</p>
-<p>Add plot of sigmoid</p>
+<p>Add plot of sigmoid plot(1:10000, (\(x) sigmoid_paramed(x) )(1:10000))</p>
+<ul>
+<li>Всего машин: 10.</li>
+<li>Цена игры: 10.</li>
+<li>У проигрышных машин матожидание выигрыша 8.88.</li>
+<li>У выигрышной машины матожидание выигрыша 12.94.</li>
+<li>При рандомной стратегии матожидание выигрыша: 9.29.</li>
+<li>При других стратегиях… Не так все просто, но симуляциями можем оценить! (найти, сделать)</li>
+</ul>
 </section>
 <section id="simulation-rules" class="level2">
 <h2 class="anchored" data-anchor-id="simulation-rules">Simulation rules</h2>
@@ -116,7 +128,6 @@ Randomly pulls machine, no brain at all</li>
 <li>Biased Bayes</li>
 <li>Anything else?</li>
 </ol>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2</code></pre>
@@ -181,7 +192,7 @@ Randomly pulls machine, no brain at all</li>
 
 </div>
 <div class="cell-output-display">
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">winning_sizes</th>
@@ -242,15 +253,24 @@ Randomly pulls machine, no brain at all</li>
 </section>
 <section id="visualization-of-strategies" class="level2">
 <h2 class="anchored" data-anchor-id="visualization-of-strategies">Visualization of strategies</h2>
+<p>Вставить графики из plots.R</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+</section>
+<section id="best-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="best-strategy">Best strategy</h2>
+<p>Оценить матожидание</p>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
 <ol type="1">
 <li>You will never win in the real casino</li>
-<li>LLN is useful</li>
+<li>Statistics is useful</li>
 <li>Simulations are fun and cheap</li>
 <li>Write as many functions as possible</li>
-<li>Programming can be fun</li>
 </ol>
 </section>
 
