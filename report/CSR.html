@@ -21,40 +21,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -101,22 +67,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.4
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-✔ purrr     1.0.2     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"../R/constants.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <section id="csr-casino-strategies-report-2024" class="level2">
 <h2 class="anchored" data-anchor-id="csr-casino-strategies-report-2024">CSR (Casino Strategies Report) 2024</h2>
 <p>Top-1 Gambling Journal according to International Casino Journals Committee</p>
@@ -129,54 +79,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="solution-specifics" class="level2">
 <h2 class="anchored" data-anchor-id="solution-specifics">Solution Specifics</h2>
 <ol type="1">
-<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible)</li>
-<li>Game simulation and <strong>data management</strong></li>
-<li>Creating different playing strategies using [un]common sense and <strong>statistics</strong>.</li>
-<li>Getting proven results by Low of Large Numbers.</li>
-<li><strong>Data Visualization</strong></li>
+<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible).</li>
+<li>Game simulation and <strong>data management</strong>.</li>
+<li>Creating different gaming strategies using [un]common sense and <strong>statistics</strong>.</li>
+<li>Finding best strategy backed by Low of Large Numbers.</li>
+<li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
 </ol>
 </section>
 <section id="casino-rules" class="level2">
 <h2 class="anchored" data-anchor-id="casino-rules">Casino Rules</h2>
 <ol type="1">
-<li>There are N machines</li>
-<li>Из них N-1 имеют матожидание выигрыша ниже цены игры</li>
-<li>1 позволяет получить достоверную прибыль in the long term</li>
+<li>There are 5 machines</li>
+<li>Из них 4 имеют матожидание выигрыша ниже цены игры</li>
+<li>1 позволяет получить достоверную прибыль in the long run</li>
+<li>Winning machine might be changed after 200 winnings in this machine to prevent exploit.</li>
 </ol>
-<table class="table">
-<caption>hello</caption>
-<thead>
-<tr class="header">
-<th>Col1</th>
-<th>Col2</th>
-<th>Col3</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+</section>
+<section id="basic-statistics" class="level2">
+<h2 class="anchored" data-anchor-id="basic-statistics">Basic statistics</h2>
+<p>Insert expected values of winnings</p>
+<p>Add plot of sigmoid</p>
+</section>
+<section id="simulation-rules" class="level2">
+<h2 class="anchored" data-anchor-id="simulation-rules">Simulation rules</h2>
+<ol type="1">
+<li>One iteration has 1000 steps</li>
+</ol>
+</section>
+<section id="strategies" class="level2">
+<h2 class="anchored" data-anchor-id="strategies">Strategies</h2>
+<ol type="1">
+<li>Randy<br>
+Randomly pulls machine, no brain at all</li>
+<li>Average man</li>
+<li>T shaped man</li>
+<li>Biased Bayes</li>
+<li>Anything else?</li>
+</ol>
 <p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(iris),<span class="at">format =</span> <span class="st">"html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table data-quarto-postprocess="true" class="table table-sm table-striped small">
 <thead>
@@ -236,7 +180,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">tibble</span>(winning_sizes, winning_p_distr, losing_p_distr),<span class="at">format =</span> <span class="st">"html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table data-quarto-postprocess="true" class="table table-sm table-striped small">
 <thead>
@@ -282,11 +225,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(winning_p_distr <span class="sc">*</span> winning_sizes) <span class="sc">|&gt;</span> <span class="fu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 12.93627</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(losing_p_distr <span class="sc">*</span> winning_sizes) <span class="sc">|&gt;</span> <span class="fu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 8.884501</code></pre>
 </div>
@@ -298,6 +239,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+</section>
+<section id="visualization-of-strategies" class="level2">
+<h2 class="anchored" data-anchor-id="visualization-of-strategies">Visualization of strategies</h2>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<ol type="1">
+<li>You will never win in the real casino</li>
+<li>LLN is useful</li>
+<li>Simulations are fun and cheap</li>
+<li>Write as many functions as possible</li>
+<li>Programming can be fun</li>
+</ol>
 </section>
 
 </main>

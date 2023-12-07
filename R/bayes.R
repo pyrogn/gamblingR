@@ -13,7 +13,7 @@
 
 # Make sure the packages tidyverse and ggridges are installed, otherwise run:
 # install.packages(c("tidyverse", "ggridges"))
-
+library(tidyverse)
 # Example usage:
 # data <- c(TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE)
 # prop_model(data)

@@ -6,11 +6,10 @@ editor: visual
 ---
 
 ```{r}
+#| include: false
 library(tidyverse)
 source("../R/constants.R")
 ```
-
-
 
 ## CSR (Casino Strategies Report) 2024
 
@@ -20,37 +19,51 @@ Top-1 Gambling Journal according to International Casino Journals Committee
 
 ## Solution Specifics
 
-1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible)
-2.  Game simulation and **data management**
-3.  Creating different playing strategies using \[un\]common sense and **statistics**.
-4.  Getting proven results by Low of Large Numbers.
-5.  **Data Visualization**
+1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible).
+2.  Game simulation and **data management**.
+3.  Creating different gaming strategies using \[un\]common sense and **statistics**.
+4.  Finding best strategy backed by Low of Large Numbers.
+5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
 
 ## Casino Rules
 
-1.  There are N machines
-2.  Из них N-1 имеют матожидание выигрыша ниже цены игры
-3.  1 позволяет получить достоверную прибыль in the long term
+1.  There are `r n_bandits` machines
+2.  Из них `r n_bandits-1` имеют матожидание выигрыша ниже цены игры
+3.  1 позволяет получить достоверную прибыль in the long run
+4.  Winning machine might be changed after 200 winnings in this machine to prevent exploit.
 
-| Col1 | Col2 | Col3 |
-|------|------|------|
-|      |      |      |
-|      |      |      |
-|      |      |      |
+## Basic statistics
 
-: hello
+Insert expected values of winnings
+
+Add plot of sigmoid
+plot(1:10000, (\\(x) sigmoid_paramed(x) )(1:10000))
+
+## Simulation rules
+
+1.  One iteration has `r n_steps` steps
+
+## Strategies
+
+1.  Randy\
+    Randomly pulls machine, no brain at all
+2.  Average man
+3.  T shaped man
+4.  Biased Bayes
+5.  Anything else?
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
+#| echo: false
 1 + 1
 knitr::kable(head(iris),format = "html")
 knitr::kable(tibble(winning_sizes, winning_p_distr, losing_p_distr),format = "html")
 (winning_p_distr * winning_sizes) |> sum()
 (losing_p_distr * winning_sizes) |> sum()
 ```
-123123 `r (losing_p_distr * winning_sizes) |> sum() |> round(2)`
-You can add options to executable code like this
+
+123123 `r (losing_p_distr * winning_sizes) |> sum() |> round(2)` You can add options to executable code like this
 
 ```{r}
 #| echo: false
@@ -58,3 +71,12 @@ You can add options to executable code like this
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
+
+## Visualization of strategies
+
+## Conclusions
+
+1.  You will never win in the real casino
+2.  Statistics is useful
+3.  Simulations are fun and cheap
+4.  Write as many functions as possible

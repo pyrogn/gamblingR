@@ -5,11 +5,19 @@ library(R6)
 library(collections)
 library(tidyverse)
 source("R/constants.R")
-# right now it is quite messy
-# and I need some base functions for graphs and testing methods
 
-# basic functions and constants --------------------------------------
 
+# library(furrr) # for parallel computation, but doesn't work
+# plan(multisession, workers = 3)
+
+# TODO --------------------------------------------------------------
+
+# 1. Make GameEnvironment resilient to disrespectful strategies
+# 2. Make some attributes private in GameEnvironment
+# 3. Add validators for strategies
+# 4. Pass somehow names of strategies to plots.R
+
+# basic functions --------------------------------------------------
 
 pull_bandit <- function(p_distr) { # random
   sample(winning_sizes, size = 1, prob = p_distr)
@@ -38,7 +46,8 @@ sigmoid <- function(x, c1, c2) {
   1 / (1 + 2.7^((-c1) * (x - c2)))
 }
 
-sigmoid_paramed <- \(x) sigmoid(x, c1 = .001, c2 = 5000)
+sigmoid_paramed <- function(x) sigmoid(x, c1 = .001, c2 = 5000)
+
 softmax <- function(x) {
   e <- 2.71828
   x_exp <- e^(x)
@@ -90,9 +99,9 @@ GameEnvironment <- R6Class("GameEnvironment",
     update_machines = function() {
       self$last_change <- self$last_change + 1
 
-      if ( # если автомат больше всего приносит выгоды и >= 200 игр
+      if ( # если автомат принес больше всего выгоды и >= 200 игр
         (self$winner == which.max(self$history_prizes)) &
-          (self$last_change >= 200)
+          (self$last_change >= n_games_change_p)
       ) {
         # значение на сигмоиде -> 1, чем больше прибыли от автомата
         p <- sigmoid_paramed(self$history_prizes[[self$winner]])
@@ -132,11 +141,6 @@ run_iter <- function(strategy) {
 
 repeate_iters <- function(strategy) {
   map(1:n_iters, ~ run_iter(strategy))
-}
-
-
-get_rewards_simulations <- function(results) {
-  map(results, ~ .x$rewards |> unlist())
 }
 
 
@@ -227,37 +231,6 @@ strategy3 <- function() {
 # r1 <- get_rewards_simulations(it100)
 
 
-# visualization -------------------------------------------------------
-
-# Остаток на балансе под конец игры
-plot_end_cash <- function(cash_left) {
-  data <- tibble(
-    x = cash + map(cash_left, sum) |> unlist() - price * n_steps
-  )
-  ggplot(data = data, aes(x = x)) +
-    geom_histogram(color = "black", fill = "white")
-}
-# plot_end_cash(r1)
-
-
-# Остаток на балансе в ходе игры
-plot_left_on_step <- function(detail_wins) {
-  data_on_step <- map(
-    detail_wins, \(x) cumsum(x) - cumsum(rep(price, n_steps))
-  ) |>
-    transpose() |>
-    map(unlist)
-  data_reduced <- map(data_on_step, mean) |> unlist()
-  data_df <- tibble(y = data_reduced + cash) |> mutate(x = row_number())
-  ggplot(data = data_df, aes(x = x, y = y)) +
-    geom_line()
-}
-# plot_left_on_step(r1)
-# add ghost individual lines, would be good,
-# need to think how to convert list of vectors to tibble
-# (using explode maybe)
-
-
 # data export ------------------------------------------------------
 
 strategies <- c(
@@ -265,10 +238,9 @@ strategies <- c(
   strategy2,
   strategy3
 )
+strategy_names <- c("Random", "s2", "s3")
 
 iterations_from_strategies <- map(strategies, repeate_iters)
-
-name_strategy <- function(x) paste0("data/s", x, ".RData")
 
 iwalk(
   iterations_from_strategies,
