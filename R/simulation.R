@@ -174,7 +174,7 @@ strategy2 <- function() {
     result <- func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
-    last_winnings[[to_pull]]$pop()
+    last_winnings[[to_pull]]$popleft()
   }
   engine
 }
@@ -206,7 +206,7 @@ strategy3 <- function() {
 
     last_winnings[[to_pull]]$push(result)
     if (last_winnings[[to_pull]]$size() > max_history) {
-      last_winnings[[to_pull]]$pop()
+      last_winnings[[to_pull]]$popleft()
     }
     lower_boundaries[[to_pull]] <<- last_winnings[[to_pull]]$as_list() |>
       unlist() |>
@@ -232,7 +232,7 @@ strategy4 <- function() {
 
     last_winnings[[to_pull]]$push(result)
     if (last_winnings[[to_pull]]$size() > max_history) {
-      last_winnings[[to_pull]]$pop()
+      last_winnings[[to_pull]]$popleft()
     }
 
     higher_boundaries[[to_pull]] <<- last_winnings[[
@@ -241,7 +241,58 @@ strategy4 <- function() {
       unlist() |>
       get_higher_boundary()
 
+    # print(higher_boundaries)
+
     if (higher_boundaries[[to_pull]] < price) {
+      to_pull <<- (to_pull) %% n_bandits + 1
+    }
+  }
+  engine
+}
+
+# chi squared player
+strategy5 <- function() {
+  # get_higher_boundary <- function(x) {
+  #   t.test(x, mu = price)$conf.int[[2]]
+  # }
+
+  get_info <- function(vec) {
+    vec_fac <- factor(vec, levels = winning_sizes)
+    data <- list()
+    get_p_val <- function(distr) {
+      chisq.test(table(vec_fac), p = distr)$p.value
+    }
+    data$p_los <- get_p_val(losing_p_distr)
+    data$p_win <- get_p_val(winning_p_distr)
+    data$mean <- mean(vec)
+    data
+  }
+
+
+  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2))) # var != 0
+  max_history <- 100
+  to_pull <- 1
+
+  engine <- function(pull_func) {
+    result <- pull_func(to_pull)
+
+    last_winnings[[to_pull]]$push(result)
+    if (last_winnings[[to_pull]]$size() > max_history) {
+      last_winnings[[to_pull]]$popleft()
+    }
+
+    # higher_boundaries[[to_pull]] <<- last_winnings[[
+    #   to_pull
+    # ]]$as_list() |>
+    #   unlist() |>
+    #   get_higher_boundary()
+
+    data <- get_info(last_winnings[[to_pull]]$as_list())
+
+    # print(higher_boundaries)
+
+    if ((last_winnings[[to_pull]]$size() >= 10) &
+      (data$p_los > data$p_win)) {
       to_pull <<- (to_pull) %% n_bandits + 1
     }
   }
@@ -253,20 +304,29 @@ strategy4 <- function() {
 
 # plays generation ---------------------------------------------------
 
+get_attr_data <- function(data, attribute) {
+  map(data, ~ .x[[attribute]] |> unlist())
+}
+
+get_rewards_simulations <- function(data) {
+  get_attr_data(data, "rewards")
+}
+
 # for debug purposes:
 
 # g <- GameEnvironment$new(n_steps)
-# str1 <- strategy3()
+# str1 <- strategy5()
 # pull_ <- init_pull_bandit_player(g)
 # walk(1:10, ~ str1(pull_))
 
-# it1 <- run_iter(strategy4)
+# it1 <- run_iter(strategy5)
 # I feel uneasy that strategy can call pull more than once per step
 
-# it100 <- repeate_iters(strategy4)
-#
-# r1 <- get_rewards_simulations(it100)
+it100 <- repeate_iters(strategy5)
 
+r1 <- get_rewards_simulations(it100)
+map_dbl(r1, mean)
+map_dbl(r1, mean) |> mean()
 
 # data export ------------------------------------------------------
 
@@ -274,9 +334,10 @@ strategies <- c(
   strategy1,
   strategy2,
   strategy3,
-  strategy4
+  strategy4,
+  strategy5
 )
-strategy_names <- c("Random", "s2", "s3", "s4")
+strategy_names <- c("Random", "s2", "s3", "s4", "s5")
 
 iterations_from_strategies <- map(strategies, repeate_iters)
 

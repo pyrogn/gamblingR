@@ -6,7 +6,7 @@ cash <- 500 # cash of player at the start
 n_bandits <- 10 # total number of machines
 
 # change distribution after this number of games
-n_games_change_p <- 500
+n_games_change_p <- 5000
 
 n_steps <- 1000 # steps in one simulation with one strategy
 n_iters <- 50 # iterations for evaluating one strategy

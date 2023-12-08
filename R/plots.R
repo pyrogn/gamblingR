@@ -7,7 +7,7 @@ source("R/constants.R")
 
 # import data ----------------------------------------------
 
-sim_data <- map(1:4, ~ read_rds(name_strategy(.x)))
+sim_data <- map(1:5, ~ read_rds(name_strategy(.x)))
 
 # helpers----------------------------------------------
 
