@@ -19,9 +19,12 @@ get_rewards_simulations <- function(data) {
   get_attr_data(data, "rewards")
 }
 
-sim_rewards <- map(sim_data, get_rewards_simulations)
+get_index_simulations <- function(data) {
+  get_attr_data(data, "ind")
+}
 
-# rewards_at_step <- map(sim_rewards, cumsum)
+sim_rewards <- map(sim_data, get_rewards_simulations)
+sim_ind <- map(sim_data, get_index_simulations)
 
 cash_revenue <- sim_rewards |>
   map_depth(2, sum) |>
@@ -156,12 +159,21 @@ get_hits_on_position <- function(data) {
 }
 
 
+# Добавить график с дисперсией выбора
 
+uniq_elems_slide = function(vec){
+  slide_dbl(vec, \(x) x |>
+              unique() |> length(), .before = 10, .after = 10
+            )
+}
 
+sim_ind |>
+  map_depth(2,uniq_elems_slide) |>
+  map(transpose) |>
+  map_depth(2, unlist) |>
+  map_depth(2, mean) |>
+  map_depth(1, unlist)
 
-# mutate( # might not use rolling average
-#   moving_avg = slide_dbl(is_target, mean, .before = 10, after = 10)
-# )
 
 
 

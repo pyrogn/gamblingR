@@ -8,7 +8,7 @@ source("R/constants.R")
 
 
 # library(furrr) # for parallel computation, but doesn't work
-# plan(multisession, workers = 3)
+# plan(multisession, workers = 4)
 
 # TODO --------------------------------------------------------------
 
@@ -18,7 +18,6 @@ source("R/constants.R")
 # 4. Pass somehow names of strategies to plots.R
 
 # Поработать над стратегиями
-# Правильно ли я понимаю, как работает deque? pop or popleft?
 
 # basic functions --------------------------------------------------
 

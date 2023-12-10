@@ -13,9 +13,7 @@ library(knitr)
 source("../R/constants.R")
 ```
 
-## CSR (Casino Strategies Report) 2024
-
-Top-1 Gambling Journal according to International Casino Journals Committee
+## CSR (Casino Strategies Report)
 
 ![](pics/ocean.jpeg){fig-align="center" width="300"}
 
@@ -23,17 +21,17 @@ Top-1 Gambling Journal according to International Casino Journals Committee
 
 1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible).
 2.  Game simulation and **data wrangling**.
-3.  Creating different gaming strategies using \[un\]common sense and **statistics**.
+3.  Creating different gaming strategies using common sense and **statistics**.
 4.  Finding best strategy backed by statistics.
 5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
-6.  **Results presentations** with Quarto (next gen RMarkdown).
+6.  **Results presentations** with Quarto.
 
 ## Casino Rules
 
-1.  There are `r n_bandits` machines
-2.  Из них `r n_bandits-1` имеют матожидание выигрыша ниже цены игры
-3.  1 позволяет получить достоверную прибыль in the long run
-4.  Winning machine might be changed after `r n_games_change_p` winnings in this machine to prevent exploit.
+1.  Всего `r n_bandits` автоматов.
+2.  Из них `r n_bandits-1` автоматов имеют матожидание выигрыша ниже цены игры.
+3.  Только один позволяет получить достоверную прибыль игроку в долгосрочной перспективе.
+4.  Но победный автомат может быть изменен после `r n_games_change_p` игр для защиты от абьюза данного автомата.
 
 ## Basic statistics
 
@@ -55,11 +53,11 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 -   У проигрышных машин матожидание выигрыша `r exp_losing |> round(2)`.
 -   У выигрышной машины матожидание выигрыша `r exp_winning |> round(2)`.
 -   При рандомной стратегии матожидание выигрыша: `r avg_win |> round(2)`.
+-   Машина может изменить свою стратегию через `r n_games_change_p` игр.
+-   В одной итерации `r n_steps` игр.
+-   Для оценки и визуализации каждая стратегия проходила `r n_iters` итераций.
 -   При других стратегиях... Не так все просто, но симуляциями можем оценить! (найти, сделать)
 
-## Simulation rules
-
-1.  One iteration has `r n_steps` steps
 
 ## Strategies
 
@@ -68,34 +66,34 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 2.  Average man
 3.  T shaped man
 4.  Biased Bayes
-5.  Anything else?
+5.  Chi
 
 
-
+Потенциальный выигрыш
 ```{r}
 #| echo: false
-1 + 1
-knitr::kable(head(iris),format = "html")
-knitr::kable(tibble(winning_sizes, winning_p_distr, losing_p_distr),format = "html") |> kable_styling()
-(winning_p_distr * winning_sizes) |> sum()
-(losing_p_distr * winning_sizes) |> sum()
+tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |> 
+  mutate(w=scales:::percent(w, accuracy=1)) |> 
+  mutate(l=scales:::percent(l, accuracy=1)) |> 
+  rename(`Размер награды` = winning_sizes) |> 
+  kable(format="html",align = "cll") |> 
+  kable_styling(full_width = FALSE, bootstrap_options = "striped") 
+# |>
+  # column_spec(2, bold = T, border_right = T, format = ) 
 ```
 
-123123 `r (losing_p_distr * winning_sizes) |> sum() |> round(2)` You can add options to executable code like this
 
 ```{r}
 #| echo: false
 2 * 2
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
-
 ## Visualization of strategies
 
 Вставить графики из plots.R
 ```{r}
 #| echo: false
-1+1
+# 1+1
 ```
 
 
