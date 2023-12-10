@@ -15,7 +15,7 @@ source("../R/constants.R")
 
 ## CSR (Casino Strategies Report)
 
-![](pics/ocean.jpeg){fig-align="center" width="300"}
+![Модная картинка](pics/ocean.jpeg){fig-align="center" width="300"}
 
 ## Solution Specifics
 
@@ -48,8 +48,8 @@ p_winning <- 1 / n_bandits
 avg_win = p_losing * exp_losing + p_winning * exp_winning
 ```
 
--   Всего машин: `r n_bandits`. 
--   Цена игры: **`r price`**. 
+-   Всего машин: `r n_bandits`.
+-   Цена игры: **`r price`**.
 -   У проигрышных машин матожидание выигрыша `r exp_losing |> round(2)`.
 -   У выигрышной машины матожидание выигрыша `r exp_winning |> round(2)`.
 -   При рандомной стратегии матожидание выигрыша: `r avg_win |> round(2)`.
@@ -58,13 +58,12 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 -   Для оценки и визуализации каждая стратегия проходила `r n_iters` итераций.
 -   При других стратегиях... Не так все просто, но симуляциями можем оценить! (найти, сделать)
 
-
 ### Примененная статистика
 
 -   Метод Монте-Карло для симуляций
 -   T-test оценки среднего
--   Test $\chi^2$ для сравнения распределений
-
+-   Test $\chi^2$ для сравнения частот дискретных распределений
+-   Z-test для оценки пропорции
 
 ## Strategies
 
@@ -75,8 +74,8 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 4.  Biased Bayes
 5.  Chi
 
-
 Потенциальный выигрыш
+
 ```{r}
 #| echo: false
 tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |> 
@@ -92,7 +91,6 @@ tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |>
   # column_spec(2, bold = T, border_right = T, format = ) 
 ```
 
-
 ```{r}
 #| echo: false
 2 * 2
@@ -101,11 +99,11 @@ tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |>
 ## Visualization of strategies
 
 Вставить графики из plots.R
+
 ```{r}
 #| echo: false
 # 1+1
 ```
-
 
 ## Best strategy
 
