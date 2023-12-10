@@ -38,6 +38,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="CSR_files/libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="CSR_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -92,10 +94,10 @@ ul.task-list li input[type="checkbox"] {
 <section id="casino-rules" class="level2">
 <h2 class="anchored" data-anchor-id="casino-rules">Casino Rules</h2>
 <ol type="1">
-<li>There are 10 machines</li>
-<li>Из них 9 имеют матожидание выигрыша ниже цены игры</li>
-<li>1 позволяет получить достоверную прибыль in the long run</li>
-<li>Winning machine might be changed after 500 winnings in this machine to prevent exploit.</li>
+<li>Всего 10 автоматов.</li>
+<li>Из них 9 автоматов имеют матожидание выигрыша ниже цены игры.</li>
+<li>Только один позволяет получить достоверную прибыль игроку в долгосрочной перспективе.</li>
+<li>Но победный автомат может быть изменен после 500 игр для защиты от абьюза данного автомата.</li>
 </ol>
 </section>
 <section id="basic-statistics" class="level2">
@@ -104,7 +106,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Add plot of sigmoid plot(1:10000, (\(x) sigmoid_paramed(x) )(1:10000))</p>
 <ul>
 <li>Всего машин: 10.</li>
-<li>Цена игры: 10.</li>
+<li>Цена игры: <strong>10</strong>.</li>
 <li>У проигрышных машин матожидание выигрыша 8.88.</li>
 <li>У выигрышной машины матожидание выигрыша 12.94.</li>
 <li>При рандомной стратегии матожидание выигрыша: 9.29.</li>
@@ -113,6 +115,14 @@ ul.task-list li input[type="checkbox"] {
 <li>Для оценки и визуализации каждая стратегия проходила 50 итераций.</li>
 <li>При других стратегиях… Не так все просто, но симуляциями можем оценить! (найти, сделать)</li>
 </ul>
+<section id="примененная-статистика" class="level3">
+<h3 class="anchored" data-anchor-id="примененная-статистика">Примененная статистика</h3>
+<ul>
+<li>Метод Монте-Карло для симуляций</li>
+<li>T-test оценки среднего</li>
+<li>Test <span class="math inline">\(\chi^2\)</span> для сравнения распределений</li>
+</ul>
+</section>
 </section>
 <section id="strategies" class="level2">
 <h2 class="anchored" data-anchor-id="strategies">Strategies</h2>
@@ -132,39 +142,53 @@ Randomly pulls machine, no brain at all</li>
 <tr class="header">
 <th style="text-align: center;" data-quarto-table-cell-role="th">Размер награды</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">w</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">l</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">one_in_w</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">l</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">one_in_l</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">0</td>
 <td style="text-align: left;">30%</td>
-<td style="text-align: left;">49%</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: center;">49%</td>
+<td style="text-align: left;">2</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">5</td>
 <td style="text-align: left;">11%</td>
-<td style="text-align: left;">20%</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: center;">20%</td>
+<td style="text-align: left;">5</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">10</td>
 <td style="text-align: left;">38%</td>
-<td style="text-align: left;">20%</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: center;">20%</td>
+<td style="text-align: left;">5</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">20</td>
 <td style="text-align: left;">19%</td>
-<td style="text-align: left;">10%</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: center;">10%</td>
+<td style="text-align: left;">10</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">100</td>
 <td style="text-align: left;">1%</td>
-<td style="text-align: left;">1%</td>
+<td style="text-align: left;">101</td>
+<td style="text-align: center;">1%</td>
+<td style="text-align: left;">101</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">1000</td>
 <td style="text-align: left;">0%</td>
-<td style="text-align: left;">0%</td>
+<td style="text-align: left;">264</td>
+<td style="text-align: center;">0%</td>
+<td style="text-align: left;">338</td>
 </tr>
 </tbody>
 </table>
@@ -172,22 +196,15 @@ Randomly pulls machine, no brain at all</li>
 
 </div>
 </div>
-<p>123123 8.88 You can add options to executable code like this</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 4</code></pre>
 </div>
 </div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
 </section>
 <section id="visualization-of-strategies" class="level2">
 <h2 class="anchored" data-anchor-id="visualization-of-strategies">Visualization of strategies</h2>
 <p>Вставить графики из plots.R</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
-</div>
-</div>
 </section>
 <section id="best-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="best-strategy">Best strategy</h2>

@@ -49,7 +49,7 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 ```
 
 -   Всего машин: `r n_bandits`. 
--   Цена игры: `r price`. 
+-   Цена игры: **`r price`**. 
 -   У проигрышных машин матожидание выигрыша `r exp_losing |> round(2)`.
 -   У выигрышной машины матожидание выигрыша `r exp_winning |> round(2)`.
 -   При рандомной стратегии матожидание выигрыша: `r avg_win |> round(2)`.
@@ -57,6 +57,13 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 -   В одной итерации `r n_steps` игр.
 -   Для оценки и визуализации каждая стратегия проходила `r n_iters` итераций.
 -   При других стратегиях... Не так все просто, но симуляциями можем оценить! (найти, сделать)
+
+
+### Примененная статистика
+
+-   Метод Монте-Карло для симуляций
+-   T-test оценки среднего
+-   Test $\chi^2$ для сравнения распределений
 
 
 ## Strategies
@@ -73,8 +80,11 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 ```{r}
 #| echo: false
 tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |> 
+  mutate(one_in_w = round(1/w)) |> 
+  mutate(one_in_l = round(1/l)) |> 
   mutate(w=scales:::percent(w, accuracy=1)) |> 
   mutate(l=scales:::percent(l, accuracy=1)) |> 
+  select(winning_sizes, w, one_in_w, l, one_in_l) |> 
   rename(`Размер награды` = winning_sizes) |> 
   kable(format="html",align = "cll") |> 
   kable_styling(full_width = FALSE, bootstrap_options = "striped") 
