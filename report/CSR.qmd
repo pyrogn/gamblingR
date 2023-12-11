@@ -21,7 +21,7 @@ source("../R/plots.R")
 This work presents simulation of casino machines (slot machines).\
 We create strategies to play maximizing profit and evaluate their efficiency.
 
-![Is it...](pics/ocean.jpeg){fig-align="center" width="300"}
+![Is it...](pics/ocean.jpeg){fig-align="left" width="300"}
 
 ## Practiced skills
 
@@ -118,7 +118,15 @@ plot_left_on_step(rewards_at_step)
 plot_bankrupcy(n_bankrupt_at_step)
 ```
 
-And two more plots on machine choice
+```{r, fig.asp=0.5, fig.width=8}
+#| echo: false
+plot_hitting_target(position_hits_df)
+```
+
+```{r, fig.asp=0.5, fig.width=8}
+#| echo: false
+plot_machine_diversity(uniq_ind_data)
+```
 
 ## Best strategy
 

@@ -76,22 +76,22 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="casino-strategies-report">Casino Strategies Report</h2>
 <p>This work presents simulation of casino machines (slot machines).<br>
 We create strategies to play maximizing profit and evaluate their efficiency.</p>
-<div class="quarto-figure quarto-figure-center">
+<div class="quarto-figure quarto-figure-left">
 <figure class="figure">
 <p><img src="pics/ocean.jpeg" class="img-fluid figure-img" width="300"></p>
-<figcaption class="figure-caption">Модная картинка</figcaption>
+<figcaption class="figure-caption">Is it…</figcaption>
 </figure>
 </div>
 </section>
 <section id="practiced-skills" class="level2">
 <h2 class="anchored" data-anchor-id="practiced-skills">Practiced skills</h2>
 <ul>
-<li>R programming. <strong>Functional</strong> code and <strong>tidyverse style</strong> where is possible. A bit of OOP with R6 classes.</li>
+<li>R programming. <strong>Functional</strong> code and <strong>tidyverse style</strong> where is possible. A bit of <strong>OOP</strong> with R6 classes.</li>
 <li>Game simulation and <strong>data wrangling</strong>.</li>
 <li>Creating different gaming strategies using common sense and <strong>statistics</strong>.</li>
 <li>Finding best strategy by Monte Carlo simulation and Law of Large Numbers.</li>
 <li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
-<li><strong>Results presentations</strong> with Quarto.</li>
+<li><strong>Results presentations with Quarto</strong>.</li>
 <li>Project management using <strong>git, GitHub, renv</strong>.</li>
 </ul>
 </section>
@@ -99,27 +99,27 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 <h2 class="anchored" data-anchor-id="casino-rules">Casino Rules</h2>
 <ul>
 <li>There are 10 machines.</li>
-<li>Из них 9 автоматов имеют матожидание выигрыша ниже цены игры.</li>
-<li>Только один позволяет получить достоверную прибыль игроку в долгосрочной перспективе.</li>
-<li>Но победный автомат может быть изменен после 500 игр для защиты от абьюза данного автомата.</li>
+<li>9 machines have expected profit lower than price.</li>
+<li>Only one machine has expected profit higher than price.</li>
+<li>Winning machine might be changed after 500 games to prevent exploit.</li>
 </ul>
 </section>
 <section id="basic-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="basic-statistics">Basic statistics</h2>
 <ul>
-<li>Game price: <strong>10</strong>.</li>
+<li>Game price: 10.</li>
 <li>Expected profit of losing machine: 8.88.</li>
 <li>Expected profit of winning machine: 12.94.</li>
 <li>Average expected profit (random strategy): 9.29.</li>
 <li>Other expected profits will be found using Monte Carlo.</li>
-<li>В одной итерации 1000 игр.</li>
-<li>Для оценки и визуализации каждая стратегия проходила 50 итераций.</li>
+<li>There are 1000 games in one iteration.</li>
+<li>Every strategy is sampled with 50 iterations.</li>
 </ul>
 <section id="statistics-involved" class="level3">
 <h3 class="anchored" data-anchor-id="statistics-involved">Statistics involved</h3>
 <ul>
 <li>Monte Carlo method for simulation</li>
-<li>t-test to estimate the confidence interval of a mean</li>
+<li><span class="math inline">\(\mathbb{t}\)</span>-test to estimate the confidence interval of a mean</li>
 <li><span class="math inline">\(\chi^2\)</span> test to estimate difference between two categorical variables</li>
 <li><span class="math inline">\(\mathbb{Z}\)</span> test to estimate the confidence interval of a proportion</li>
 </ul>
@@ -234,7 +234,16 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 <p><img src="CSR_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
-<p>And two more plots on machine choice</p>
+<div class="cell" data-fig.asp="0.5">
+<div class="cell-output-display">
+<p><img src="CSR_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.5">
+<div class="cell-output-display">
+<p><img src="CSR_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
 </section>
 <section id="best-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="best-strategy">Best strategy</h2>
@@ -295,7 +304,7 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 </div>
 <div class="cell" data-fig.asp="0.3">
 <div class="cell-output-display">
-<p><img src="CSR_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
+<p><img src="CSR_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 </section>
@@ -305,7 +314,7 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 <li>You will never win in a real casino</li>
 <li>Statistics is useful</li>
 <li>Simulations are fun and cheap</li>
-<li>Write as many functions as possible. I have 43, actually.</li>
+<li>Write as many functions as possible. I have 45, actually.</li>
 </ol>
 </section>
 

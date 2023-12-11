@@ -2,7 +2,7 @@
 
 
 price <- 10 # price of one game
-cash <- 500 # cash of player at the start
+cash <- 300 # cash of player at the start
 n_bandits <- 10 # total number of machines
 
 # change distribution after this number of games

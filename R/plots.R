@@ -4,6 +4,8 @@ library(tidyverse)
 library(ggridges)
 library(slider)
 library(ggrepel)
+library(glue)
+library(latex2exp)
 # cannot use relative path because of qmd file
 source("/Users/pyro/R/gamblingR/R/constants.R")
 
@@ -125,16 +127,15 @@ plot_expected_profit <- function(profit_ci) {
     geom_errorbarh(aes(xmin = lb, xmax = hb)) +
     labs(
       x = "Average profit per a game", y = "Strategy",
-      title = "Comparison of expected profit from a game"
+      title = TeX(paste0("Comparison of expected profit from a game. ",
+      "$\\alpha$ = 95%"))
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = seq(-2, 2, .2)) +
     geom_vline(xintercept = 0, color = "red", alpha = 0.8)
 }
 
-plot_expected_profit(profit_ci)
-
-
+# plot_expected_profit(profit_ci)
 
 
 # Остаток на балансе в ходе игры
@@ -159,15 +160,17 @@ plot_left_on_step <- function(detail_wins) {
     ) +
     scale_color_discrete(guide = FALSE)
 }
-plot_left_on_step(rewards_at_step)
+# plot_left_on_step(rewards_at_step)
 
 
 # Процент банкротов на определенном шаге
 
-plot_bankrupcy = function(n_bankrupt_at_step) {
+plot_bankrupcy <- function(n_bankrupt_at_step) {
   n_bankrupt_at_step |>
     mutate_strategy() |>
-    mutate(label = ifelse(step == n_steps, as.character(strategy), NA)) |>
+    mutate(label = ifelse(
+      step == n_steps, as.character(strategy), NA
+    )) |>
     ggplot(aes(x = step, y = prop, color = strategy)) +
     geom_line() +
     theme_minimal() +
@@ -178,12 +181,12 @@ plot_bankrupcy = function(n_bankrupt_at_step) {
     ) +
     scale_y_continuous(labels = scales::percent) +
     geom_label_repel(aes(label = label),
-                     nudge_x = 50,
-                     na.rm = TRUE
+      nudge_x = 50,
+      na.rm = TRUE
     ) +
     scale_color_discrete(guide = FALSE)
 }
-plot_bankrupcy(n_bankrupt_at_step)
+# plot_bankrupcy(n_bankrupt_at_step)
 
 
 # Про индексы и специфику выбора
@@ -215,8 +218,10 @@ get_hits_on_position <- function(data) {
     ) |>
     ungroup() |>
     mutate(position_look = if_else( # maybe edit position
-      abs(rel_position) < 300, rel_position, NA
+      -30 <= rel_position & rel_position <= 300,
+      rel_position, NA
     )) |>
+    filter(!is.na(position_look)) |>
     select(index, step_n, position_look)
 
 
@@ -229,7 +234,6 @@ get_hits_on_position <- function(data) {
   res <- history_changes |>
     inner_join(choice_at_step, by = "step_n") |>
     mutate(is_target = as.numeric(index == choice)) |>
-    filter(!is.na(position_look)) |>
     group_by(position_look) |>
     summarise(n = n(), target_hit = sum(is_target))
   res
@@ -237,19 +241,31 @@ get_hits_on_position <- function(data) {
 
 
 
-# position_hits_list <- sim_data |>
-#   map(~ map_dfr(., get_hits_on_position) |>
-#     group_by(position_look) |>
-#     summarize(prop_hit = sum(target_hit) / sum(n))) |>
-#   suppressMessages()
-#
-# position_hits_list |>
-#   bind_rows(.id = "strategy") |>
-#   ggplot(aes(x = position_look, y = prop_hit, color = strategy)) +
-#   geom_line()
+position_hits_df <- sim_data |>
+  map(~ map_dfr(., get_hits_on_position) |>
+    group_by(position_look) |>
+    summarize(prop_hit = sum(target_hit) / sum(n)))|>
+  bind_rows(.id = "strategy") |>
+  suppressMessages()
 
+plot_hitting_target <- function(position_hits_df) {
+  position_hits_df |>
+    mutate_strategy() |>
+    ggplot(aes(x = position_look, y = prop_hit, color = strategy)) +
+    geom_line() +
+    geom_vline(xintercept = 0, linewidth = 1, color = "red") +
+    theme_minimal() +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(breaks = seq(-200, 300, 20)) +
+    labs(
+      x = "Relative step to winning machine change",
+      y = "Proportion hits to winning machine",
+      title = "Speed of finding a winning machine"
+    )
+}
+# plot_hitting_target(position_hits_df)
 
-# Добавить график с дисперсией выбора
+# График с дисперсией выбора
 
 uniq_elems_slide <- function(vec) {
   slide_dbl(
@@ -270,6 +286,20 @@ uniq_ind_data <- sim_ind |>
   map(~ tibble(average_lookout = .) |> mutate(step = row_number())) |>
   bind_rows(.id = "strategy")
 
-# uniq_ind_data |>
-#   ggplot(aes(x = step, y = average_lookout, color = strategy)) +
-#   geom_line()
+plot_machine_diversity <- function(uniq_ind_data) {
+  uniq_ind_data |>
+    mutate_strategy() |>
+    ggplot(aes(x = step, y = average_lookout, color = strategy)) +
+    geom_line() +
+    theme_minimal() +
+    labs(
+      x = "Step",
+      title = TeX(glue(
+        "Machines diversity in step $\\pm$ 10 steps"
+      )),
+      y = "Avg number of machines"
+    ) +
+    coord_cartesian(ylim = c(1, n_bandits)) +
+    scale_y_continuous(breaks = 1:n_bandits)
+}
+# plot_machine_diversity(uniq_ind_data)

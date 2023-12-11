@@ -1,9 +1,9 @@
-# gamblingR (WIP)
+# gamblingR
 
 ## Open Report File
 
 1.  Clone `git clone --filter=tree:0 https://github.com/pyrogn/gamblingR.git` (only last commit, because data diff may be huge).
-2.  Open [report/CSR.html](report/CSR.html) to read it (locally, not in GitHub)
+2.  Open [report/CSR.html](report/CSR.html) to read it (locally in webbrowser, not in GitHub)
 
 ## If you want to run it
 
