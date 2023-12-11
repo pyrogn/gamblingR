@@ -81,13 +81,13 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 </section>
-<section id="solution-specifics" class="level2">
-<h2 class="anchored" data-anchor-id="solution-specifics">Solution Specifics</h2>
+<section id="what-is-this-about" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-this-about">What is this about</h2>
 <ol type="1">
-<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible).</li>
+<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible). A little bit of OOP with R6 class.</li>
 <li>Game simulation and <strong>data wrangling</strong>.</li>
 <li>Creating different gaming strategies using common sense and <strong>statistics</strong>.</li>
-<li>Finding best strategy backed by statistics.</li>
+<li>Finding best strategy backed by statistics. (monte carlo + estimation).</li>
 <li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
 <li><strong>Results presentations</strong> with Quarto.</li>
 </ol>
@@ -103,35 +103,39 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="basic-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="basic-statistics">Basic statistics</h2>
-<p>Insert expected values of winnings</p>
-<p>Add plot of sigmoid plot(1:10000, (\(x) sigmoid_paramed(x) )(1:10000))</p>
 <ul>
 <li>Всего машин: 10.</li>
-<li>Цена игры: <strong>10</strong>.</li>
+<li>Цена игры: <strong>10</strong> денег.</li>
 <li>У проигрышных машин матожидание выигрыша 8.88.</li>
 <li>У выигрышной машины матожидание выигрыша 12.94.</li>
 <li>При рандомной стратегии матожидание выигрыша: 9.29.</li>
-<li>Машина может изменить свою стратегию через 500 игр.</li>
+<li>Матожидание выигрыша других стратегий будем оценивать через симуляции.</li>
 <li>В одной итерации 1000 игр.</li>
 <li>Для оценки и визуализации каждая стратегия проходила 50 итераций.</li>
-<li>При других стратегиях… Не так все просто, но симуляциями можем оценить! (найти, сделать)</li>
 </ul>
 <section id="примененная-статистика" class="level3">
 <h3 class="anchored" data-anchor-id="примененная-статистика">Примененная статистика</h3>
 <ul>
 <li>Метод Монте-Карло для симуляций</li>
-<li>T-test оценки среднего</li>
+<li>T-test для оценки истинного среднего</li>
 <li>Test <span class="math inline">\(\chi^2\)</span> для сравнения частот дискретных распределений</li>
-<li>Z-test для оценки пропорции</li>
+<li>Z-test для оценки истинной пропорции</li>
 </ul>
 </section>
 </section>
 <section id="strategies" class="level2">
 <h2 class="anchored" data-anchor-id="strategies">Strategies</h2>
+<p>И где-то более подробное описание стратегий.</p>
 <ol type="1">
-<li>Randy<br>
-Randomly pulls machine, no brain at all</li>
-<li>Average man</li>
+<li>Randy
+<ol type="1">
+<li>Randomly pulls machine at every moment</li>
+</ol></li>
+<li>Hate-to-lose man
+<ol type="1">
+<li>Plays at least 10 games at machine.</li>
+<li>If he loses money 3 times in a row he jumps to another random machine (or not random, where not played?)</li>
+</ol></li>
 <li>T shaped man</li>
 <li>Biased Bayes</li>
 <li>Chi</li>
@@ -218,7 +222,7 @@ Randomly pulls machine, no brain at all</li>
 <li>You will never win in the real casino</li>
 <li>Statistics is useful</li>
 <li>Simulations are fun and cheap</li>
-<li>Write as many functions as possible</li>
+<li>Write as many functions as possible. I have 42 functions.</li>
 </ol>
 </section>
 

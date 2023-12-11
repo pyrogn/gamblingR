@@ -7,6 +7,7 @@ editor: visual
 
 ```{r}
 #| include: false
+# styler:::style_active_file()
 library(tidyverse)
 library(kableExtra)
 library(knitr)
@@ -17,14 +18,15 @@ source("../R/constants.R")
 
 ![Модная картинка](pics/ocean.jpeg){fig-align="center" width="300"}
 
-## Solution Specifics
+## What is this about
 
-1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible).
+1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible). A little bit of OOP with R6 classes.
 2.  Game simulation and **data wrangling**.
 3.  Creating different gaming strategies using common sense and **statistics**.
 4.  Finding best strategy backed by statistics. (monte carlo + estimation).
 5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
 6.  **Results presentations** with Quarto.
+7.  Project management using **git, GitHub, renv**.
 
 ## Casino Rules
 
@@ -35,41 +37,38 @@ source("../R/constants.R")
 
 ## Basic statistics
 
-Insert expected values of winnings
-
-Add plot of sigmoid plot(1:10000, (\\(x) sigmoid_paramed(x) )(1:10000))
-
 ```{r}
 #| include: false
 exp_losing <- sum(losing_p_distr * winning_sizes)
 exp_winning <- sum(winning_p_distr * winning_sizes)
 p_losing <- (n_bandits - 1) / n_bandits
 p_winning <- 1 / n_bandits
-avg_win = p_losing * exp_losing + p_winning * exp_winning
+avg_win <- p_losing * exp_losing + p_winning * exp_winning
 ```
 
 -   Всего машин: `r n_bandits`.
--   Цена игры: **`r price`**.
+-   Цена игры: **`r price`** денег.
 -   У проигрышных машин матожидание выигрыша `r exp_losing |> round(2)`.
 -   У выигрышной машины матожидание выигрыша `r exp_winning |> round(2)`.
 -   При рандомной стратегии матожидание выигрыша: `r avg_win |> round(2)`.
--   Машина может изменить свою стратегию через `r n_games_change_p` игр.
+-   Матожидание выигрыша других стратегий будем оценивать через симуляции.
 -   В одной итерации `r n_steps` игр.
 -   Для оценки и визуализации каждая стратегия проходила `r n_iters` итераций.
--   При других стратегиях... Не так все просто, но симуляциями можем оценить! (найти, сделать)
 
 ### Примененная статистика
 
 -   Метод Монте-Карло для симуляций
--   T-test оценки среднего
+-   T-test для оценки истинного среднего
 -   Test $\chi^2$ для сравнения частот дискретных распределений
--   Z-test для оценки пропорции
+-   Z-test для оценки истинной пропорции
 
 ## Strategies
 
-1.  Randy\
-    Randomly pulls machine, no brain at all
-2.  Average man
+1.  Randy
+    1.  Randomly pulls machine at every moment
+2.  Hate-to-lose man
+    1.  Plays at least 10 games at machine.
+    2.  If he loses money 3 times in a row he jumps to another random machine (or not random, where not played?)
 3.  T shaped man
 4.  Biased Bayes
 5.  Chi
@@ -78,17 +77,17 @@ avg_win = p_losing * exp_losing + p_winning * exp_winning
 
 ```{r}
 #| echo: false
-tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |> 
-  mutate(one_in_w = round(1/w)) |> 
-  mutate(one_in_l = round(1/l)) |> 
-  mutate(w=scales:::percent(w, accuracy=1)) |> 
-  mutate(l=scales:::percent(l, accuracy=1)) |> 
-  select(winning_sizes, w, one_in_w, l, one_in_l) |> 
-  rename(`Размер награды` = winning_sizes) |> 
-  kable(format="html",align = "cll") |> 
-  kable_styling(full_width = FALSE, bootstrap_options = "striped") 
+tibble(winning_sizes, w = winning_p_distr, l = losing_p_distr) |>
+  mutate(one_in_w = round(1 / w)) |>
+  mutate(one_in_l = round(1 / l)) |>
+  mutate(w = scales:::percent(w, accuracy = 1)) |>
+  mutate(l = scales:::percent(l, accuracy = 1)) |>
+  select(winning_sizes, w, one_in_w, l, one_in_l) |>
+  rename(`Размер награды` = winning_sizes) |>
+  kable(format = "html", align = "cll") |>
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
 # |>
-  # column_spec(2, bold = T, border_right = T, format = ) 
+# column_spec(2, bold = T, border_right = T, format = )
 ```
 
 ```{r}
@@ -111,7 +110,13 @@ tibble(winning_sizes, w=winning_p_distr, l=losing_p_distr) |>
 
 ## Conclusions
 
+```{r cnt functions from bash}
+#| include: false
+cnt_function <- system("git grep -E 'function' ../R | wc -l", intern = T) |>
+  as.integer()
+```
+
 1.  You will never win in the real casino
 2.  Statistics is useful
 3.  Simulations are fun and cheap
-4.  Write as many functions as possible
+4.  Write as many functions as possible. I have `r cnt_function`, actually.

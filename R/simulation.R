@@ -24,11 +24,11 @@ source("R/constants.R")
 
 # basic functions --------------------------------------------------
 
-pull_bandit <- function(p_distr) { # random
+pull_bandit <- function(p_distr) {
   sample(winning_sizes, size = 1, prob = p_distr)
 }
 
-get_winning_bandit <- function(last_winner = 0) { # random
+get_winning_bandit <- function(last_winner = 0) {
   sample_from <- 1:n_bandits
   sample_from <- sample_from[sample_from != last_winner]
   winning_bandit <- sample(sample_from, size = 1)
@@ -41,20 +41,23 @@ get_distrs <- function(winner) {
   p_distrs
 }
 
+# I don't use it. Delete?
 get_winning_distrs <- function(last_winner = 0) {
   winning <- get_winning_bandit(last_winner)
   p_distrs <- get_distrs(winning)
   list("winning" = winning, "p_distrs" = p_distrs)
 }
 
+e <- 2.71828
+
 sigmoid <- function(x, c1, c2) {
-  1 / (1 + 2.7^((-c1) * (x - c2)))
+  1 / (1 + e^((-c1) * (x - c2)))
 }
 
+# сигмоида, подстроенная под средний выигрыш на автомате
 sigmoid_paramed <- function(x) sigmoid(x, c1 = .001, c2 = 5000)
 
 softmax <- function(x) {
-  e <- 2.71828
   x_exp <- e^(x)
   x_exp / sum(x_exp)
 }
@@ -68,6 +71,7 @@ GameEnvironment <- R6Class("GameEnvironment",
     n = 1,
     rewards = NULL,
     indices = NULL,
+    changes = NULL, # на каком шаге какой автомат был выигрышным
 
     initialize = function(n_steps) {
       self$rewards <- vector("list", n_steps)
@@ -76,38 +80,31 @@ GameEnvironment <- R6Class("GameEnvironment",
       private$winner <- get_winning_bandit()
       private$p_distrs <- get_distrs(private$winner)
 
-      private$changes <- list(c(private$winner, 1))
+      self$changes <- list(c(private$winner, 1))
       private$history_prizes <- vector("numeric", length = n_bandits)
     },
-    pull_machine = function(index) {
+    pull_machine = function(index) { # метод для стратегии
       if (self$n > n_steps) {
+        # стратегия может заиграться, возвращаем 0 в таком случае,
+        # сайд эффектов никаких не происходит
         return(0)
       }
       reward <- pull_bandit(private$p_distrs[[index]])
 
       self$indices[[self$n]] <- index
       self$rewards[[self$n]] <- reward
-      self$n <- self$n + 1 # maybe check for n <= n_steps
+      self$n <- self$n + 1
 
       private$update_machines()
-      private$history_prizes[[index]] <- private$history_prizes[[
-        index
-      ]] + reward
+      private$history_prizes[[index]] <-
+        private$history_prizes[[index]] + reward
 
       return(reward)
-    },
-    get_changes = function() {
-      # strategy shouldn't call this code,
-      # but I don't know how to enforce it
-      private$changes
     }
   ),
   private = list(
-    # attributes for casino
     p_distrs = NULL,
     winner = NULL,
-    changes = NULL, # на каком шаге какой автомат был выигрышным
-
     history_prizes = list(),
     last_change = 0,
     update_machines = function() {
@@ -122,15 +119,14 @@ GameEnvironment <- R6Class("GameEnvironment",
         is_change <- sample(0:1, size = 1, prob = c(1 - p, p))
 
         if (is_change) {
-          # print(p)
           private$winner <- get_winning_bandit(private$winner)
           private$p_distrs <- get_distrs(private$winner)
           private$history_prizes <- vector("numeric", length = n_bandits)
-          private$changes <- append(
-            private$changes, list(c(private$winner, self$n))
+          self$changes <- append(
+            self$changes, list(c(private$winner, self$n))
           )
           private$last_change <- 0
-        }
+        } # лесенка прямо как в джаве
       }
     }
   )
@@ -144,18 +140,20 @@ init_pull_bandit_player <- function(game_environment) {
 }
 
 run_iter <- function(strategy) {
-  g <- GameEnvironment$new(n_steps)
-  str1 <- strategy()
-  pull_ <- init_pull_bandit_player(g)
+  g <- GameEnvironment$new(n_steps) # init environment
+  strategy_step <- strategy() # init strategy
+  # get method of game environment instance to put into strategy
+  pull_lever <- init_pull_bandit_player(g)
   while (g$n <= n_steps) { # iterate while num. of games <= n_steps
-    str1(pull_)
+    strategy_step(pull_lever)
   }
-  # walk(1:n_steps, ~ str1(pull_))
+  # функция возвращает инфу для дальнейшего анализа
   list(
-    ind = g$indices, rewards = g$rewards, changes = g$get_changes()
+    ind = g$indices, rewards = g$rewards, changes = g$changes
   )
 }
 
+# Повторяем итерации и возвращаем список
 repeate_iters <- function(strategy) {
   map(1:n_iters, ~ run_iter(strategy))
 }
@@ -166,13 +164,29 @@ repeate_iters <- function(strategy) {
 # they might be classes
 # and they will be validated to enforce structure
 
+# На данный структура стратегий -
+# функция, возвращающая функцию, которая принимает
+# функцию нажимания ручки и получения награды.
+# Для игры внутренняя функция обязана совершить одно или
+# несколько нажиманий ручки как side-effect.
+# Иначе программа зависнет на while. Функция ничего не возвращает.
+# Во внешней функции можно создать переменные состояний (closure)
+
 # random play
 
 strategy1 <- function() {
   engine <- function(func) {
+    choice =
     throwaway <- func(sample(1:n_bandits, size = 1))
   }
   engine
+}
+
+strip_deque = function(q, max_size) {
+  if (q$size() > max_size) {
+    q$popleft() # throwaway
+  }
+  return(q)
 }
 
 # play where max avg mean of winnings
@@ -318,6 +332,7 @@ strategy5 <- function() {
 
 # plays generation ---------------------------------------------------
 
+# These fns defined in plots.R, delete it after stabilization
 get_attr_data <- function(data, attribute) {
   map(data, ~ .x[[attribute]] |> unlist())
 }
@@ -335,7 +350,7 @@ get_rewards_simulations <- function(data) {
 
 # it1 <- run_iter(strategy5)
 # I feel uneasy that strategy can call pull more than once per step
-
+#
 # it100 <- repeate_iters(strategy5)
 # #
 # r1 <- get_rewards_simulations(it100)
