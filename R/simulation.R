@@ -2,7 +2,7 @@ styler:::style_active_file()
 
 library(rlang)
 library(R6)
-library(collections)
+library(collections) # useful data structures
 library(tidyverse)
 source("R/constants.R")
 
@@ -10,24 +10,14 @@ source("R/constants.R")
 # library(furrr) # for parallel computation, but doesn't work
 # plan(multisession, workers = 4)
 
-# TODO --------------------------------------------------------------
-
-# 3. Add validators for strategies
-# 4. Pass somehow names of strategies to plots.R
-
-# Поработать над стратегиями
-
-# 2-3 раза меньше 10 - переключение на другую машину (рост недовольства)
-
-# Стратегия с нахождением нижнего порога пропорции и матожиданием,
-# более устойчивым к выбросам
-
 # basic functions --------------------------------------------------
 
+# сыграть 1 раз
 pull_bandit <- function(p_distr) {
   sample(winning_sizes, size = 1, prob = p_distr)
 }
 
+# получить новую победную машину
 get_winning_bandit <- function(last_winner = 0) {
   sample_from <- 1:n_bandits
   sample_from <- sample_from[sample_from != last_winner]
@@ -35,18 +25,13 @@ get_winning_bandit <- function(last_winner = 0) {
   winning_bandit
 }
 
+# Получить распределения с учетом индекса победной машины
 get_distrs <- function(winner) {
   p_distrs <- replicate(n_bandits, losing_p_distr, simplify = FALSE)
   p_distrs[[winner]] <- winning_p_distr
   p_distrs
 }
 
-# I don't use it. Delete?
-get_winning_distrs <- function(last_winner = 0) {
-  winning <- get_winning_bandit(last_winner)
-  p_distrs <- get_distrs(winning)
-  list("winning" = winning, "p_distrs" = p_distrs)
-}
 
 e <- 2.71828
 
@@ -67,10 +52,9 @@ softmax <- function(x) {
 
 GameEnvironment <- R6Class("GameEnvironment",
   public = list(
-    # attributes from player
-    n = 1,
-    rewards = NULL,
-    indices = NULL,
+    n = 1, # текущий шаг
+    rewards = NULL, # история призов
+    indices = NULL, # история индексов автоматов
     changes = NULL, # на каком шаге какой автомат был выигрышным
 
     initialize = function(n_steps) {
@@ -103,10 +87,10 @@ GameEnvironment <- R6Class("GameEnvironment",
     }
   ),
   private = list(
-    p_distrs = NULL,
-    winner = NULL,
-    history_prizes = list(),
-    last_change = 0,
+    p_distrs = NULL, # распределения автоматов
+    winner = NULL, # текущий выигрышный автомат
+    history_prizes = list(), # история изменений выигрышного автомата
+    last_change = 0, # кол-во шагов с прошлого изменения
     update_machines = function() {
       private$last_change <- private$last_change + 1
 
@@ -132,22 +116,16 @@ GameEnvironment <- R6Class("GameEnvironment",
   )
 )
 
-init_pull_bandit_player <- function(game_environment) {
-  pull_bandit_player <- function(index) {
-    game_environment$pull_machine(index)
-  }
-  pull_bandit_player
-}
-
+# запуск одной итерации стратегии
 run_iter <- function(strategy) {
   g <- GameEnvironment$new(n_steps) # init environment
   strategy_step <- strategy() # init strategy
   # get method of game environment instance to put into strategy
-  pull_lever <- init_pull_bandit_player(g)
+  pull_lever <- g$pull_machine
   while (g$n <= n_steps) { # iterate while num. of games <= n_steps
     strategy_step(pull_lever)
   }
-  # функция возвращает инфу для дальнейшего анализа
+  # функция возвращает данные в списке для дальнейшего анализа
   list(
     ind = g$indices, rewards = g$rewards, changes = g$changes
   )
@@ -161,9 +139,6 @@ repeate_iters <- function(strategy) {
 
 # strategies ----------------------------------------------------------
 
-# they might be classes
-# and they will be validated to enforce structure
-
 # На данный структура стратегий -
 # функция, возвращающая функцию, которая принимает
 # функцию нажимания ручки и получения награды.
@@ -173,7 +148,6 @@ repeate_iters <- function(strategy) {
 # Во внешней функции можно создать переменные состояний (closure)
 
 # random play
-
 strategy1 <- function() {
   engine <- function(func) {
     choice <-
@@ -252,7 +226,7 @@ strategy4 <- function() {
     t <- table(vec)
     table_names <- names(t)
     sum_rewards <- 0
-    pp <- 0 # для нормализации вероятностей
+    pp <- 0 # для нормализации вероятностей (не очень удачной)
     for (i in seq_along(t)) {
       test <- prop.test(
         t[[i]], size,
@@ -326,21 +300,15 @@ strategy5 <- function() {
   engine
 }
 
+# for interactive debug --------------------------------------------
 
-# write strategy based on Bayesian statistics
-
-# for debug purposes -----------------------------------------------
-
-# These fns defined in plots.R, delete it after stabilization
-get_attr_data <- function(data, attribute) {
-  map(data, ~ .x[[attribute]] |> unlist())
-}
-
-get_rewards_simulations <- function(data) {
-  get_attr_data(data, "rewards")
-}
-
-# for debug purposes:
+# get_attr_data <- function(data, attribute) {
+#   map(data, ~ .x[[attribute]] |> unlist())
+# }
+#
+# get_rewards_simulations <- function(data) {
+#   get_attr_data(data, "rewards")
+# }
 
 # g <- GameEnvironment$new(n_steps)
 # str1 <- strategy4()
@@ -348,10 +316,8 @@ get_rewards_simulations <- function(data) {
 # walk(1:100, ~ str1(pull_))
 
 # it1 <- run_iter(strategy5)
-# I feel uneasy that strategy can call pull more than once per step
 
-
-# it100 <- repeate_iters(strategy4)
+# it100 <- repeate_iters(strategy2)
 #
 # r1 <- get_rewards_simulations(it100)
 # map_dbl(r1, mean)
@@ -359,6 +325,8 @@ get_rewards_simulations <- function(data) {
 
 # data export ------------------------------------------------------
 
+# нельзя менять последовательность, связка стратегии и имени - хардкод
+# который можно было бы убрать, но это того не стоит
 strategies <- c(
   strategy1,
   strategy2,
@@ -366,7 +334,6 @@ strategies <- c(
   strategy4,
   strategy5
 )
-strategy_names <- c("Random", "s2", "s3", "s4", "s5")
 
 iterations_from_strategies <- map(strategies, repeate_iters)
 

@@ -10,6 +10,8 @@ library(latex2exp)
 source("/Users/pyro/R/gamblingR/R/constants.R")
 
 # Выглядит очень страшно, и это тяжело читать. И редактировать.
+# Я даже затрудняюсь это комментировать, не добавит ясности.
+
 # Есть идеи, как можно было бы это упростить.
 # 1. На этапе ранее как можно меньше создать вложенных структур
 # 2. За место map_depth одного уровня использовать map(data, map())
@@ -32,6 +34,9 @@ get_rewards_simulations <- function(data) {
 get_index_simulations <- function(data) {
   get_attr_data(data, "ind")
 }
+
+
+# plots and data -----------------------------------------------------
 
 sim_rewards <- map(sim_data, get_rewards_simulations)
 sim_ind <- map(sim_data, get_index_simulations)
@@ -94,10 +99,6 @@ mutate_strategy <- function(df) {
     )
 }
 
-# plots ----------------------------------------------------
-
-# Найти также из этого графика среднее и sd!
-
 # Остаток на балансе под конец игры
 
 profit_ci <- cash_profit |>
@@ -127,8 +128,10 @@ plot_expected_profit <- function(profit_ci) {
     geom_errorbarh(aes(xmin = lb, xmax = hb)) +
     labs(
       x = "Average profit per a game", y = "Strategy",
-      title = TeX(paste0("Comparison of expected profit from a game. ",
-      "$\\alpha$ = 95%"))
+      title = TeX(paste0(
+        "Comparison of expected profit from a game. ",
+        "$\\alpha$ = 95%"
+      ))
     ) +
     theme_minimal() +
     scale_x_continuous(breaks = seq(-2, 2, .2)) +
@@ -244,7 +247,7 @@ get_hits_on_position <- function(data) {
 position_hits_df <- sim_data |>
   map(~ map_dfr(., get_hits_on_position) |>
     group_by(position_look) |>
-    summarize(prop_hit = sum(target_hit) / sum(n)))|>
+    summarize(prop_hit = sum(target_hit) / sum(n))) |>
   bind_rows(.id = "strategy") |>
   suppressMessages()
 

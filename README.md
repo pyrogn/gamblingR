@@ -8,7 +8,7 @@
 ## If you want to run it
 
 1.  Install dependencies from [renv.lock](renv.lock). [How-to](https://rstudio.github.io/renv/reference/restore.html)
-2.  Run [R/simulation.R](R/simulation.R) to generate new random data
+2.  Run [R/simulation.R](R/simulation.R) to generate new random data. Edit [R/constants.R](R/constants.R) to change simulation parameters.
 3.  Render [report/CSR.qmd](report/CSR.qmd) into html
 
 ## TODO
@@ -18,7 +18,7 @@ Important:
 -   [x] Write 5 strategies with decent logic
 -   [x] Write functions for plots
 -   [x] Make readable html
--   [ ] Add some comments, make code a bit more readable
+-   [x] Add some comments, make code a bit more readable (so far so good)
 
 Less important:
 

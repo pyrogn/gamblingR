@@ -18,14 +18,14 @@ source("../R/plots.R")
 
 ## Casino Strategies Report
 
-This work presents simulation of casino machines (slot machines).\
+This project presents simulation of casino machines (slot machines).\
 We create strategies to play maximizing profit and evaluate their efficiency.
 
 ![Is it...](pics/ocean.jpeg){fig-align="left" width="300"}
 
 ## Practiced skills
 
--   R programming. **Functional** code and **tidyverse style** where is possible. A bit of **OOP** with R6 classes.
+-   R programming. **Functional** code and **tidyverse style** where is possible. A bit of **OOP** with R6 classes. Code quality is a topic of discussion, though.
 -   Game simulation and **data wrangling**.
 -   Creating different gaming strategies using common sense and **statistics**.
 -   Finding best strategy by Monte Carlo simulation and Law of Large Numbers.
