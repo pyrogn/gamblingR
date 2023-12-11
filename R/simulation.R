@@ -12,14 +12,12 @@ source("R/constants.R")
 
 # TODO --------------------------------------------------------------
 
-# 1. Make GameEnvironment resilient to disrespectful strategies
-# 2. Make some attributes private in GameEnvironment
 # 3. Add validators for strategies
 # 4. Pass somehow names of strategies to plots.R
 
 # Поработать над стратегиями
 
-# 2-3 раза меньше 10 - переключение на другую машину
+# 2-3 раза меньше 10 - переключение на другую машину (рост недовольства)
 
 # Стратегия с нахождением нижнего порога пропорции и матожиданием,
 # более устойчивым к выбросам
@@ -71,58 +69,67 @@ GameEnvironment <- R6Class("GameEnvironment",
     rewards = NULL,
     indices = NULL,
 
-    # attributes for casino # should be private I guess
-    p_distrs = NULL,
-    winner = NULL,
-    changes = NULL, # на каком шаге какой автомат был выигрышным
-
-    history_prizes = list(),
-    last_change = 0,
     initialize = function(n_steps) {
       self$rewards <- vector("list", n_steps)
       self$indices <- vector("list", n_steps)
 
-      self$winner <- get_winning_bandit()
-      self$p_distrs <- get_distrs(self$winner)
+      private$winner <- get_winning_bandit()
+      private$p_distrs <- get_distrs(private$winner)
 
-      self$changes <- list(c(self$winner, 1))
-      self$history_prizes <- vector("numeric", length = n_bandits)
+      private$changes <- list(c(private$winner, 1))
+      private$history_prizes <- vector("numeric", length = n_bandits)
     },
     pull_machine = function(index) {
-      reward <- pull_bandit(self$p_distrs[[index]])
+      if (self$n > n_steps) {
+        return(0)
+      }
+      reward <- pull_bandit(private$p_distrs[[index]])
 
       self$indices[[self$n]] <- index
       self$rewards[[self$n]] <- reward
       self$n <- self$n + 1 # maybe check for n <= n_steps
 
       private$update_machines()
-      self$history_prizes[[index]] <- self$history_prizes[[index]] +
-        reward
+      private$history_prizes[[index]] <- private$history_prizes[[
+        index
+      ]] + reward
 
-      reward
+      return(reward)
+    },
+    get_changes = function() {
+      # strategy shouldn't call this code,
+      # but I don't know how to enforce it
+      private$changes
     }
   ),
   private = list(
+    # attributes for casino
+    p_distrs = NULL,
+    winner = NULL,
+    changes = NULL, # на каком шаге какой автомат был выигрышным
+
+    history_prizes = list(),
+    last_change = 0,
     update_machines = function() {
-      self$last_change <- self$last_change + 1
+      private$last_change <- private$last_change + 1
 
       if ( # если автомат принес больше всего выгоды и >= 200 игр
-        (self$winner == which.max(self$history_prizes)) &
-          (self$last_change >= n_games_change_p)
+        (private$winner == which.max(private$history_prizes)) &
+          (private$last_change >= n_games_change_p)
       ) {
         # значение на сигмоиде -> 1, чем больше прибыли от автомата
-        p <- sigmoid_paramed(self$history_prizes[[self$winner]])
+        p <- sigmoid_paramed(private$history_prizes[[private$winner]])
         is_change <- sample(0:1, size = 1, prob = c(1 - p, p))
 
         if (is_change) {
           # print(p)
-          self$winner <- get_winning_bandit(self$winner)
-          self$p_distrs <- get_distrs(self$winner)
-          self$history_prizes <- vector("numeric", length = n_bandits)
-          self$changes <- append(
-            self$changes, list(c(self$winner, self$n))
+          private$winner <- get_winning_bandit(private$winner)
+          private$p_distrs <- get_distrs(private$winner)
+          private$history_prizes <- vector("numeric", length = n_bandits)
+          private$changes <- append(
+            private$changes, list(c(private$winner, self$n))
           )
-          self$last_change <- 0
+          private$last_change <- 0
         }
       }
     }
@@ -140,9 +147,12 @@ run_iter <- function(strategy) {
   g <- GameEnvironment$new(n_steps)
   str1 <- strategy()
   pull_ <- init_pull_bandit_player(g)
-  walk(1:n_steps, ~ str1(pull_))
+  while (g$n <= n_steps) { # iterate while num. of games <= n_steps
+    str1(pull_)
+  }
+  # walk(1:n_steps, ~ str1(pull_))
   list(
-    ind = g$indices, rewards = g$rewards, changes = g$changes
+    ind = g$indices, rewards = g$rewards, changes = g$get_changes()
   )
 }
 
@@ -263,7 +273,7 @@ strategy5 <- function() {
   get_info <- function(vec) {
     vec_fac <- factor(vec, levels = winning_sizes)
     data <- list()
-    get_p_val <- function(distr) {
+    get_p_val <- function(distr) { # maybe to use fisher.test?
       chisq.test(table(vec_fac), p = distr)$p.value
     }
     data$p_los <- get_p_val(losing_p_distr)
@@ -326,11 +336,11 @@ get_rewards_simulations <- function(data) {
 # it1 <- run_iter(strategy5)
 # I feel uneasy that strategy can call pull more than once per step
 
-it100 <- repeate_iters(strategy5)
-
-r1 <- get_rewards_simulations(it100)
-map_dbl(r1, mean)
-map_dbl(r1, mean) |> mean()
+# it100 <- repeate_iters(strategy5)
+# #
+# r1 <- get_rewards_simulations(it100)
+# map_dbl(r1, mean)
+# map_dbl(r1, mean) |> mean()
 
 # data export ------------------------------------------------------
 

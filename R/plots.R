@@ -161,14 +161,14 @@ get_hits_on_position <- function(data) {
 
 # Добавить график с дисперсией выбора
 
-uniq_elems_slide = function(vec){
+uniq_elems_slide <- function(vec) {
   slide_dbl(vec, \(x) x |>
-              unique() |> length(), .before = 10, .after = 10
-            )
+    unique() |>
+    length(), .before = 10, .after = 10)
 }
 
 sim_ind |>
-  map_depth(2,uniq_elems_slide) |>
+  map_depth(2, uniq_elems_slide) |>
   map(transpose) |>
   map_depth(2, unlist) |>
   map_depth(2, mean) |>

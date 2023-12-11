@@ -22,7 +22,7 @@ source("../R/constants.R")
 1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible).
 2.  Game simulation and **data wrangling**.
 3.  Creating different gaming strategies using common sense and **statistics**.
-4.  Finding best strategy backed by statistics.
+4.  Finding best strategy backed by statistics. (monte carlo + estimation).
 5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
 6.  **Results presentations** with Quarto.
 
