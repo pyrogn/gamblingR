@@ -81,11 +81,15 @@ n_bankrupt_at_step <- bankrupt_at_step |>
 
 mutate_strategy <- function(df) {
   df |>
-    mutate(strategy=
-    factor(
-      strategy,
-      lab = c("Randy", "NotLoser", "T-man", "Conservative", "Cheater")
-    ))
+    mutate(
+      strategy =
+        factor(
+          strategy,
+          labels = c(
+            "Randy", "NotLoser", "T-man", "Conservative", "Cheater"
+          )
+        )
+    )
 }
 
 # plots ----------------------------------------------------
@@ -94,31 +98,38 @@ mutate_strategy <- function(df) {
 
 # Остаток на балансе под конец игры
 
-profit_ci = cash_profit |>
+profit_ci <- cash_profit |>
   mutate(x = x / n_steps) |>
   group_by(strategy) |>
   summarize(
-    mean=mean(x),
+    mean = mean(x),
     se = sd(x) / sqrt(n()),
-    n=n()
+    n = n()
   ) |>
-  mutate(delta_ci = qt(0.975, df=n)*se) |> # alpha=95%
-  mutate(lb = mean-delta_ci,
-         hb = mean+delta_ci)
+  mutate(delta_ci = qt(0.975, df = n) * se) |> # alpha=95%
+  mutate(
+    lb = mean - delta_ci,
+    hb = mean + delta_ci
+  )
 
 
 
 plot_expected_profit <- function(profit_ci) {
-
   profit_ci |>
     mutate_strategy() |>
-    ggplot(aes(y=strategy, x=mean, group=strategy)) +
-    geom_errorbarh(aes(xmin=lb, xmax=hb)) +
-    labs(x='Средняя прибыль за 1 игру', y='Стратегия'
-         ,title='Сравнение матожидания прибыли от игры') +
+    ggplot(
+      aes(
+        y = fct_reorder(strategy, mean), x = mean, group = strategy
+      )
+    ) +
+    geom_errorbarh(aes(xmin = lb, xmax = hb)) +
+    labs(
+      x = "Average profit per a game", y = "Strategy",
+      title = "Comparison of expected profit from a game"
+    ) +
     theme_minimal() +
-    scale_x_continuous(breaks=seq(-2, 2, .2)) +
-    geom_vline(xintercept=0, color='red', alpha=0.8)
+    scale_x_continuous(breaks = seq(-2, 2, .2)) +
+    geom_vline(xintercept = 0, color = "red", alpha = 0.8)
 }
 
 plot_expected_profit(profit_ci)
@@ -130,38 +141,49 @@ plot_expected_profit(profit_ci)
 plot_left_on_step <- function(detail_wins) {
   detail_wins |>
     mutate_strategy() |>
-    mutate(label = as.character(strategy)) |>
-  ggplot(aes(
-    x = x, y = y, color = strategy, group=strategy
-  )) +
-    geom_line(size=1) +
-    labs(x = "Шаг", y = "Накопленная прибыль",
-         title = 'Оценка накопления прибыли в процессе игры') +
-    coord_cartesian(xlim = c(0, n_steps)) +
+    mutate(label = ifelse(x == n_steps, as.character(strategy), NA)) |>
+    ggplot(aes(
+      x = x, y = y, color = strategy
+    )) +
+    geom_line(size = 1) +
+    labs(
+      x = "Step", y = "Cumulative profit",
+      title = "Game profit estimation by steps"
+    ) +
+    # coord_cartesian(xlim = c(0, n_steps)) + # не обрезает почему-то
     theme_minimal() +
-    geom_hline(yintercept = 0, color='black', linetype='dotted')
-  # + # пока что не работает
-  # geom_label_repel(aes(label = label),
-  #                  nudge_x = 1,
-  #                  na.rm = TRUE)
+    geom_hline(yintercept = 0, color = "black", linetype = "dotted") +
+    geom_label_repel(aes(label = label),
+      nudge_x = 50,
+      na.rm = TRUE
+    ) +
+    scale_color_discrete(guide = FALSE)
 }
 plot_left_on_step(rewards_at_step)
 
 
 # Процент банкротов на определенном шаге
 
-n_bankrupt_at_step |>
-  mutate_strategy() |>
-  ggplot(aes(x = step, y = prop, color = strategy)) +
-  geom_line() +
-  theme_minimal() +
-  labs(
-    y = "Процент банкротов на шаге",
-    x = "Шаг",
-    title='Скорость банкротства'
-  ) +
-  scale_y_continuous(labels = scales::percent)
-
+plot_bankrupcy = function(n_bankrupt_at_step) {
+  n_bankrupt_at_step |>
+    mutate_strategy() |>
+    mutate(label = ifelse(step == n_steps, as.character(strategy), NA)) |>
+    ggplot(aes(x = step, y = prop, color = strategy)) +
+    geom_line() +
+    theme_minimal() +
+    labs(
+      y = "Percent of bankrupts",
+      x = "Step",
+      title = "Speed of bankrupcy"
+    ) +
+    scale_y_continuous(labels = scales::percent) +
+    geom_label_repel(aes(label = label),
+                     nudge_x = 50,
+                     na.rm = TRUE
+    ) +
+    scale_color_discrete(guide = FALSE)
+}
+plot_bankrupcy(n_bankrupt_at_step)
 
 
 # Про индексы и специфику выбора

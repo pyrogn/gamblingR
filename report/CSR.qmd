@@ -2,6 +2,7 @@
 title: "CSR"
 author: "Pavel"
 format: html
+theme: journal
 editor: visual
 ---
 
@@ -15,26 +16,29 @@ source("../R/constants.R")
 source("../R/plots.R")
 ```
 
-## CSR (Casino Strategies Report)
+## Casino Strategies Report
 
-![Модная картинка](pics/ocean.jpeg){fig-align="center" width="300"}
+This work presents simulation of casino machines (slot machines).\
+We create strategies to play maximizing profit and evaluate their efficiency.
 
-## What is this about
+![Is it...](pics/ocean.jpeg){fig-align="center" width="300"}
 
-1.  Code. **Functional** code and **tidyverse style** where is possible. A bit of OOP with R6 classes.
-2.  Game simulation and **data wrangling**.
-3.  Creating different gaming strategies using common sense and **statistics**.
-4.  Finding best strategy by Monte Carlo simulation and Law of Large Numbers.
-5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
-6.  **Results presentations** with Quarto.
-7.  Project management using **git, GitHub, renv**.
+## Practiced skills
+
+-   R programming. **Functional** code and **tidyverse style** where is possible. A bit of **OOP** with R6 classes.
+-   Game simulation and **data wrangling**.
+-   Creating different gaming strategies using common sense and **statistics**.
+-   Finding best strategy by Monte Carlo simulation and Law of Large Numbers.
+-   **Data Visualization** of metrics by different strategies using **ggplot2**.
+-   **Results presentations with Quarto**.
+-   Project management using **git, GitHub, renv**.
 
 ## Casino Rules
 
-1.  Всего `r n_bandits` автоматов.
-2.  Из них `r n_bandits-1` автоматов имеют матожидание выигрыша ниже цены игры.
-3.  Только один позволяет получить достоверную прибыль игроку в долгосрочной перспективе.
-4.  Но победный автомат может быть изменен после `r n_games_change_p` игр для защиты от абьюза данного автомата.
+-   There are `r n_bandits` machines.
+-   `r n_bandits-1` machines have expected profit lower than price.
+-   Only one machine has expected profit higher than price.
+-   Winning machine might be changed after `r n_games_change_p` games to prevent exploit.
 
 ## Basic statistics
 
@@ -47,74 +51,79 @@ p_winning <- 1 / n_bandits
 avg_win <- p_losing * exp_losing + p_winning * exp_winning
 ```
 
--   Всего машин: `r n_bandits`.
--   Цена игры: **`r price`** денег.
--   У проигрышных машин матожидание выигрыша `r exp_losing |> round(2)`.
--   У выигрышной машины матожидание выигрыша `r exp_winning |> round(2)`.
--   При рандомной стратегии матожидание выигрыша: `r avg_win |> round(2)`.
--   Матожидание выигрыша других стратегий будем оценивать через симуляции.
--   В одной итерации `r n_steps` игр.
--   Для оценки и визуализации каждая стратегия проходила `r n_iters` итераций.
+-   Game price: `r price`.
+-   Expected profit of losing machine: `r exp_losing |> round(2)`.
+-   Expected profit of winning machine: `r exp_winning |> round(2)`.
+-   Average expected profit (random strategy): `r avg_win |> round(2)`.
+-   Other expected profits will be found using Monte Carlo.
+-   There are `r n_steps` games in one iteration.
+-   Every strategy is sampled with `r n_iters` iterations.
 
-### Примененная статистика
+### Statistics involved
 
--   Метод Монте-Карло для симуляций
--   T-test для оценки среднего
--   Test $\chi^2$ для сравнения частот дискретных распределений
--   Z-test для оценки пропорции
+-   Monte Carlo method for simulation
+-   $\mathbb{t}$-test to estimate the confidence interval of a mean
+-   $\chi^2$ test to estimate difference between two categorical variables
+-   $\mathbb{Z}$ test to estimate the confidence interval of a proportion
 
 ## Strategies
 
-1.  Randy 🤪
-    1.  Randomly pulls machine at every moment
-2.  Hate-to-lose man 😎
-    1.  Has 10 patience points.
-    2.  Every lose costs 1-2 patience points.
-    3.  Win restores patience points.
-    4.  If patience is depleted player jumps to another random machine.
-3.  T-man 🍵
-    1.  Builds for every machine confidence interval of expected value using T-test
-    2.  At every step chooses a random machine with weights - lower boundary of CI.
-    3.  Keeps last 50 games for every machine, so he will adapt to change of winning machine.
-4.  Conservative player 🧱
-    1.  Collects winning history from every machine.
-    2.  Finds proportion of every event and takes lower boundary using Z test for proportions.
-    3.  Plays a machine until its adjusted expected value is less than 7.
-5.  Son of a casino designer 🤡
-    1.  Knows true distributions of winning and losing machines.
-    2.  Plays at least 10 times at every machine. Keep history of 100 games.
-    3.  Uses $\chi^2$ test for comparing current distribution of machine to the know distributions.
-    4.  Plays in a particular machine, until the machine is likely to be losing. Then moves to the next one on the right.
+-   Randy 🤪
+    -   Randomly pulls machine at every moment
+-   Hate-to-lose man 😎
+    -   Has 10 patience points.
+    -   Every lose costs 1-2 patience points.
+    -   Win restores patience points.
+    -   If patience is depleted player jumps to another random machine.
+-   T-man 🍵
+    -   Builds for every machine confidence interval of expected value using T-test
+    -   At every step chooses a random machine with weights - lower boundary of CI.
+    -   Keeps last 50 games for every machine, so he will adapt to change of winning machine.
+-   Conservative player 🧱
+    -   Collects winning history from every machine.
+    -   Finds proportion of every event and takes lower boundary using Z test for proportions.
+    -   Plays a machine until its adjusted expected value is less than 7.
+-   Son of a casino designer 🤡
+    -   Knows true distributions of winning and losing machines.
+    -   Plays at least 10 times at every machine. Keep history of 100 games.
+    -   Uses $\chi^2$ test for comparing current distribution of machine to the know distributions.
+    -   Plays in a particular machine, until the machine is likely to be losing. Then moves to the next one on the right.
 
-Потенциальный выигрыш
+Winnings and probabilities
 
-```{r}
+```{r, warning=FALSE}
 #| echo: false
 tibble(winning_sizes, w = winning_p_distr, l = losing_p_distr) |>
-  mutate(one_in_w = round(1 / w)) |>
-  mutate(one_in_l = round(1 / l)) |>
-  mutate(w = scales:::percent(w, accuracy = .1)) |>
-  mutate(l = scales:::percent(l, accuracy = .1)) |>
-  select(winning_sizes, w, one_in_w, l, one_in_l) |>
-  rename(`Размер награды` = winning_sizes) |>
+  mutate(winning_chance = round(1 / w)) |>
+  mutate(losing_change = round(1 / l)) |>
+  mutate(winning_machine = scales:::percent(w, accuracy = .1)) |>
+  mutate(losing_machine = scales:::percent(l, accuracy = .1)) |>
+  select(winning_sizes, winning_machine, winning_chance, losing_machine, losing_change) |>
+  rename(`Winning` = winning_sizes) |>
   kable(format = "html", align = "c") |>
   kable_styling(full_width = FALSE, bootstrap_options = "striped") |>
   column_spec(3, border_right = T) |> 
   column_spec(1, border_right = T) 
 ```
 
-## Visualization of strategies
+## Strategies visualization
 
-```{r, fig.asp=0.5, fig.width=8}
+```{r, fig.asp=0.5, fig.width=8, warning=FALSE}
 #| echo: false
 plot_left_on_step(rewards_at_step)
+```
+
+```{r, fig.asp=0.5, fig.width=8, warning=FALSE}
+#| echo: false
+plot_bankrupcy(n_bankrupt_at_step)
 ```
 
 And two more plots on machine choice
 
 ## Best strategy
 
-Матожидание выигрыша от игры
+Expected value from playing a game
+
 ```{r}
 #| echo: false
 profit_ci |>
@@ -122,17 +131,17 @@ profit_ci |>
   arrange(-mean) |>
   mutate(across(c(mean, lb, hb), ~ round(., 3))) |> 
   mutate(
-    string = str_c(
+    string_repr = str_c(
       mean,
       " [", lb,
       "; ", hb,
       "]"
       )
     ) |>
-  select(strategy, mean, lb, hb, string) |> 
+  select(strategy, mean, lb, hb, string_repr) |> 
+  rename(lower_bound=lb, upper_bound=hb) |> 
   kable(format = "html", align = "c")
 ```
-
 
 ```{r, fig.asp=0.3, fig.width=8}
 #| echo: false

@@ -72,8 +72,10 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="csr-casino-strategies-report" class="level2">
-<h2 class="anchored" data-anchor-id="csr-casino-strategies-report">CSR (Casino Strategies Report)</h2>
+<section id="casino-strategies-report" class="level2">
+<h2 class="anchored" data-anchor-id="casino-strategies-report">Casino Strategies Report</h2>
+<p>This work presents simulation of casino machines (slot machines).<br>
+We create strategies to play maximizing profit and evaluate their efficiency.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="pics/ocean.jpeg" class="img-fluid figure-img" width="300"></p>
@@ -81,94 +83,93 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 </section>
-<section id="what-is-this-about" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-this-about">What is this about</h2>
-<ol type="1">
-<li>Code. <strong>Functional</strong> code and <strong>tidyverse style</strong> where is possible. A bit of OOP with R6 classes.</li>
+<section id="practiced-skills" class="level2">
+<h2 class="anchored" data-anchor-id="practiced-skills">Practiced skills</h2>
+<ul>
+<li>R programming. <strong>Functional</strong> code and <strong>tidyverse style</strong> where is possible. A bit of OOP with R6 classes.</li>
 <li>Game simulation and <strong>data wrangling</strong>.</li>
 <li>Creating different gaming strategies using common sense and <strong>statistics</strong>.</li>
 <li>Finding best strategy by Monte Carlo simulation and Law of Large Numbers.</li>
 <li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
 <li><strong>Results presentations</strong> with Quarto.</li>
 <li>Project management using <strong>git, GitHub, renv</strong>.</li>
-</ol>
+</ul>
 </section>
 <section id="casino-rules" class="level2">
 <h2 class="anchored" data-anchor-id="casino-rules">Casino Rules</h2>
-<ol type="1">
-<li>Всего 10 автоматов.</li>
+<ul>
+<li>There are 10 machines.</li>
 <li>Из них 9 автоматов имеют матожидание выигрыша ниже цены игры.</li>
 <li>Только один позволяет получить достоверную прибыль игроку в долгосрочной перспективе.</li>
 <li>Но победный автомат может быть изменен после 500 игр для защиты от абьюза данного автомата.</li>
-</ol>
+</ul>
 </section>
 <section id="basic-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="basic-statistics">Basic statistics</h2>
 <ul>
-<li>Всего машин: 10.</li>
-<li>Цена игры: <strong>10</strong> денег.</li>
-<li>У проигрышных машин матожидание выигрыша 8.88.</li>
-<li>У выигрышной машины матожидание выигрыша 12.94.</li>
-<li>При рандомной стратегии матожидание выигрыша: 9.29.</li>
-<li>Матожидание выигрыша других стратегий будем оценивать через симуляции.</li>
+<li>Game price: <strong>10</strong>.</li>
+<li>Expected profit of losing machine: 8.88.</li>
+<li>Expected profit of winning machine: 12.94.</li>
+<li>Average expected profit (random strategy): 9.29.</li>
+<li>Other expected profits will be found using Monte Carlo.</li>
 <li>В одной итерации 1000 игр.</li>
 <li>Для оценки и визуализации каждая стратегия проходила 50 итераций.</li>
 </ul>
-<section id="примененная-статистика" class="level3">
-<h3 class="anchored" data-anchor-id="примененная-статистика">Примененная статистика</h3>
+<section id="statistics-involved" class="level3">
+<h3 class="anchored" data-anchor-id="statistics-involved">Statistics involved</h3>
 <ul>
-<li>Метод Монте-Карло для симуляций</li>
-<li>T-test для оценки среднего</li>
-<li>Test <span class="math inline">\(\chi^2\)</span> для сравнения частот дискретных распределений</li>
-<li>Z-test для оценки пропорции</li>
+<li>Monte Carlo method for simulation</li>
+<li>t-test to estimate the confidence interval of a mean</li>
+<li><span class="math inline">\(\chi^2\)</span> test to estimate difference between two categorical variables</li>
+<li><span class="math inline">\(\mathbb{Z}\)</span> test to estimate the confidence interval of a proportion</li>
 </ul>
 </section>
 </section>
 <section id="strategies" class="level2">
 <h2 class="anchored" data-anchor-id="strategies">Strategies</h2>
-<ol type="1">
+<ul>
 <li>Randy 🤪
-<ol type="1">
+<ul>
 <li>Randomly pulls machine at every moment</li>
-</ol></li>
+</ul></li>
 <li>Hate-to-lose man 😎
-<ol type="1">
+<ul>
 <li>Has 10 patience points.</li>
 <li>Every lose costs 1-2 patience points.</li>
 <li>Win restores patience points.</li>
 <li>If patience is depleted player jumps to another random machine.</li>
-</ol></li>
+</ul></li>
 <li>T-man 🍵
-<ol type="1">
+<ul>
 <li>Builds for every machine confidence interval of expected value using T-test</li>
 <li>At every step chooses a random machine with weights - lower boundary of CI.</li>
 <li>Keeps last 50 games for every machine, so he will adapt to change of winning machine.</li>
-</ol></li>
+</ul></li>
 <li>Conservative player 🧱
-<ol type="1">
+<ul>
 <li>Collects winning history from every machine.</li>
 <li>Finds proportion of every event and takes lower boundary using Z test for proportions.</li>
 <li>Plays a machine until its adjusted expected value is less than 7.</li>
-</ol></li>
+</ul></li>
 <li>Son of a casino designer 🤡
-<ol type="1">
+<ul>
 <li>Knows true distributions of winning and losing machines.</li>
 <li>Plays at least 10 times at every machine. Keep history of 100 games.</li>
 <li>Uses <span class="math inline">\(\chi^2\)</span> test for comparing current distribution of machine to the know distributions.</li>
 <li>Plays in a particular machine, until the machine is likely to be losing. Then moves to the next one on the right.</li>
-</ol></li>
-</ol>
-<p>Потенциальный выигрыш</p>
+</ul></li>
+</ul>
+<p>Winnings and probabilities</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table table-striped table-sm small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
-<th style="text-align: center;" data-quarto-table-cell-role="th">Размер награды</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">w</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">one_in_w</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">l</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">one_in_l</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Winning</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">winning_machine</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">winning_chance</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">losing_machine</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">losing_change</th>
 </tr>
 </thead>
 <tbody>
@@ -221,18 +222,23 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="visualization-of-strategies" class="level2">
-<h2 class="anchored" data-anchor-id="visualization-of-strategies">Visualization of strategies</h2>
+<section id="strategies-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="strategies-visualization">Strategies visualization</h2>
 <div class="cell" data-fig.asp="0.5">
 <div class="cell-output-display">
 <p><img src="CSR_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<div class="cell" data-fig.asp="0.5">
+<div class="cell-output-display">
+<p><img src="CSR_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 <p>And two more plots on machine choice</p>
 </section>
 <section id="best-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="best-strategy">Best strategy</h2>
-<p>Матожидание выигрыша от игры</p>
+<p>Expected value from playing a game</p>
 <div class="cell">
 <div class="cell-output-display">
 <table data-quarto-postprocess="true" class="table table-sm table-striped small">
@@ -240,9 +246,9 @@ ul.task-list li input[type="checkbox"] {
 <tr class="header">
 <th style="text-align: center;" data-quarto-table-cell-role="th">strategy</th>
 <th style="text-align: center;" data-quarto-table-cell-role="th">mean</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">lb</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">hb</th>
-<th style="text-align: center;" data-quarto-table-cell-role="th">string</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">lower_bound</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">upper_bound</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">string_repr</th>
 </tr>
 </thead>
 <tbody>
@@ -289,7 +295,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div class="cell" data-fig.asp="0.3">
 <div class="cell-output-display">
-<p><img src="CSR_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="768"></p>
+<p><img src="CSR_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 </section>
@@ -299,7 +305,7 @@ ul.task-list li input[type="checkbox"] {
 <li>You will never win in a real casino</li>
 <li>Statistics is useful</li>
 <li>Simulations are fun and cheap</li>
-<li>Write as many functions as possible. I have 42, actually.</li>
+<li>Write as many functions as possible. I have 43, actually.</li>
 </ol>
 </section>
 

@@ -16,8 +16,8 @@
 Important:
 
 -   [x] Write 5 strategies with decent logic
--   [ ] Write functions for plots
--   [ ] Make readable html
+-   [x] Write functions for plots
+-   [x] Make readable html
 -   [ ] Add some comments, make code a bit more readable
 
 Less important:
