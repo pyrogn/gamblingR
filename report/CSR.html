@@ -84,12 +84,13 @@ ul.task-list li input[type="checkbox"] {
 <section id="what-is-this-about" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-this-about">What is this about</h2>
 <ol type="1">
-<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible). A little bit of OOP with R6 class.</li>
+<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible). A little bit of OOP with R6 classes.</li>
 <li>Game simulation and <strong>data wrangling</strong>.</li>
 <li>Creating different gaming strategies using common sense and <strong>statistics</strong>.</li>
 <li>Finding best strategy backed by statistics. (monte carlo + estimation).</li>
 <li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
 <li><strong>Results presentations</strong> with Quarto.</li>
+<li>Project management using <strong>git, GitHub, renv</strong>.</li>
 </ol>
 </section>
 <section id="casino-rules" class="level2">
@@ -117,28 +118,45 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="примененная-статистика">Примененная статистика</h3>
 <ul>
 <li>Метод Монте-Карло для симуляций</li>
-<li>T-test для оценки истинного среднего</li>
+<li>T-test для оценки среднего</li>
 <li>Test <span class="math inline">\(\chi^2\)</span> для сравнения частот дискретных распределений</li>
-<li>Z-test для оценки истинной пропорции</li>
+<li>Z-test для оценки пропорции</li>
 </ul>
 </section>
 </section>
 <section id="strategies" class="level2">
 <h2 class="anchored" data-anchor-id="strategies">Strategies</h2>
-<p>И где-то более подробное описание стратегий.</p>
 <ol type="1">
-<li>Randy
+<li>Randy 🤪
 <ol type="1">
 <li>Randomly pulls machine at every moment</li>
 </ol></li>
-<li>Hate-to-lose man
+<li>Hate-to-lose man 😎
 <ol type="1">
-<li>Plays at least 10 games at machine.</li>
-<li>If he loses money 3 times in a row he jumps to another random machine (or not random, where not played?)</li>
+<li>Has 10 patience points.</li>
+<li>Every lose costs 1-2 patience points.</li>
+<li>Win restores patience points.</li>
+<li>If patience is depleted player jumps to another random machine.</li>
 </ol></li>
-<li>T shaped man</li>
-<li>Biased Bayes</li>
-<li>Chi</li>
+<li>T-man 🍵
+<ol type="1">
+<li>Builds for every machine confidence interval of expected value using T-test</li>
+<li>At every step chooses a random machine with weights - lower boundary of CI.</li>
+<li>Keeps last 50 games for every machine, so he will adapt to change of winning machine.</li>
+</ol></li>
+<li>Conservative player 🧱
+<ol type="1">
+<li>Collects winning history from every machine.</li>
+<li>Finds proportion of every event and takes lower boundary using Z test for proportions.</li>
+<li>Plays a machine with higher expected value (how is so?).</li>
+</ol></li>
+<li>Son of a casino designer 🤡
+<ol type="1">
+<li>Knows true distributions of winning and losing machines.</li>
+<li>Plays at least 10 times at every machine. Keep history of 100 games.</li>
+<li>Uses <span class="math inline">\(\chi^2\)</span> test for comparing current distribution of machine to the know distributions.</li>
+<li>Plays in a particular machine, until the machine is likely to be losing. Then moves to the next one on the right.</li>
+</ol></li>
 </ol>
 <p>Потенциальный выигрыш</p>
 <div class="cell">
@@ -147,54 +165,54 @@ ul.task-list li input[type="checkbox"] {
 <thead>
 <tr class="header">
 <th style="text-align: center;" data-quarto-table-cell-role="th">Размер награды</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">w</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">one_in_w</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">w</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">one_in_w</th>
 <th style="text-align: center;" data-quarto-table-cell-role="th">l</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">one_in_l</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">one_in_l</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;">0</td>
-<td style="text-align: left;">30%</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: center;">49%</td>
-<td style="text-align: left;">2</td>
+<td style="text-align: center; border-right: 1px solid;">0</td>
+<td style="text-align: center;">30.3%</td>
+<td style="text-align: center; border-right: 1px solid;">3</td>
+<td style="text-align: center;">49.4%</td>
+<td style="text-align: center;">2</td>
 </tr>
 <tr class="even">
+<td style="text-align: center; border-right: 1px solid;">5</td>
+<td style="text-align: center;">11.4%</td>
+<td style="text-align: center; border-right: 1px solid;">9</td>
+<td style="text-align: center;">19.7%</td>
 <td style="text-align: center;">5</td>
-<td style="text-align: left;">11%</td>
-<td style="text-align: left;">9</td>
-<td style="text-align: center;">20%</td>
-<td style="text-align: left;">5</td>
 </tr>
 <tr class="odd">
+<td style="text-align: center; border-right: 1px solid;">10</td>
+<td style="text-align: center;">37.9%</td>
+<td style="text-align: center; border-right: 1px solid;">3</td>
+<td style="text-align: center;">19.7%</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: center; border-right: 1px solid;">20</td>
+<td style="text-align: center;">19.0%</td>
+<td style="text-align: center; border-right: 1px solid;">5</td>
+<td style="text-align: center;">9.9%</td>
 <td style="text-align: center;">10</td>
-<td style="text-align: left;">38%</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: center;">20%</td>
-<td style="text-align: left;">5</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">20</td>
-<td style="text-align: left;">19%</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: center;">10%</td>
-<td style="text-align: left;">10</td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">100</td>
-<td style="text-align: left;">1%</td>
-<td style="text-align: left;">101</td>
-<td style="text-align: center;">1%</td>
-<td style="text-align: left;">101</td>
+<td style="text-align: center; border-right: 1px solid;">100</td>
+<td style="text-align: center;">1.0%</td>
+<td style="text-align: center; border-right: 1px solid;">101</td>
+<td style="text-align: center;">1.0%</td>
+<td style="text-align: center;">101</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">1000</td>
-<td style="text-align: left;">0%</td>
-<td style="text-align: left;">264</td>
-<td style="text-align: center;">0%</td>
-<td style="text-align: left;">338</td>
+<td style="text-align: center; border-right: 1px solid;">1000</td>
+<td style="text-align: center;">0.4%</td>
+<td style="text-align: center; border-right: 1px solid;">264</td>
+<td style="text-align: center;">0.3%</td>
+<td style="text-align: center;">338</td>
 </tr>
 </tbody>
 </table>
@@ -202,15 +220,10 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 </div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
-</div>
-</div>
 </section>
 <section id="visualization-of-strategies" class="level2">
 <h2 class="anchored" data-anchor-id="visualization-of-strategies">Visualization of strategies</h2>
-<p>Вставить графики из plots.R</p>
+<p>Вставить графики из plots.R. (А где обрабатывать данные? Думаю, там же. Хотя бы первоначально.)</p>
 </section>
 <section id="best-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="best-strategy">Best strategy</h2>
@@ -219,10 +232,10 @@ ul.task-list li input[type="checkbox"] {
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
 <ol type="1">
-<li>You will never win in the real casino</li>
+<li>You will never win in a real casino</li>
 <li>Statistics is useful</li>
 <li>Simulations are fun and cheap</li>
-<li>Write as many functions as possible. I have 42 functions.</li>
+<li>Write as many functions as possible. I have 41, actually.</li>
 </ol>
 </section>
 

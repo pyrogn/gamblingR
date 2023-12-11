@@ -5,6 +5,12 @@ library(ggridges)
 library(slider)
 source("R/constants.R")
 
+# Выглядит очень страшно, и это тяжело читать. И редактировать.
+# Есть идеи, как можно было бы это упростить.
+# 1. На этапе ранее как можно меньше создать вложенных структур
+# 2. За место map_depth одного уровня использовать map(data, map())
+# 3. Получше познакомиться с паттернами работы в tidy формате
+
 # import data ----------------------------------------------
 
 sim_data <- map(1:5, ~ read_rds(name_strategy(.x)))
@@ -25,6 +31,9 @@ get_index_simulations <- function(data) {
 
 sim_rewards <- map(sim_data, get_rewards_simulations)
 sim_ind <- map(sim_data, get_index_simulations)
+
+# changes shouldn't be unlist
+# map(sim_data, ~ get_attr_data(.x, "changes"))
 
 cash_revenue <- sim_rewards |>
   map_depth(2, sum) |>
@@ -138,13 +147,13 @@ get_hits_on_position <- function(data) {
       )
     ) |>
     ungroup() |>
-    mutate(position_look = if_else(
+    mutate(position_look = if_else( # maybe edit position
       abs(rel_position) < 300, rel_position, NA
     )) |>
     select(index, step_n, position_look)
 
 
-  choice_at_step <- sim_data[[3]][[1]]$ind |>
+  choice_at_step <- data$ind |>
     unlist() |>
     as_tibble() |>
     mutate(step_n = row_number()) |>
@@ -160,21 +169,44 @@ get_hits_on_position <- function(data) {
 }
 
 
+
+position_hits_list = sim_data |>
+  map(~map_dfr(., get_hits_on_position) |>
+        group_by(position_look) |>
+        summarize(prop_hit = sum(target_hit)/sum(n))
+      ) |>
+  suppressMessages()
+
+position_hits_list |>
+bind_rows(.id='strategy') |>
+  ggplot(aes(x=position_look, y=prop_hit, color=strategy)) +
+  geom_line()
+
+
 # Добавить график с дисперсией выбора
 
 uniq_elems_slide <- function(vec) {
-  slide_dbl(vec, \(x) x |>
-    unique() |>
-    length(), .before = 10, .after = 10)
+  slide_dbl(
+    vec,
+    \(x) x |>
+      unique() |>
+      length(),
+    .before = 10, .after = 10
+  )
 }
 
-sim_ind |>
+uniq_ind_data = sim_ind |>
   map_depth(2, uniq_elems_slide) |>
   map(transpose) |>
   map_depth(2, unlist) |>
   map_depth(2, mean) |>
-  map_depth(1, unlist)
+  map_depth(1, unlist) |>
+  map(~ tibble(average_lookout=.) |> mutate(step=row_number())) |>
+  bind_rows(.id='strategy')
 
+uniq_ind_data |>
+  ggplot(aes(x=step, y=average_lookout, color=strategy)) +
+  geom_line()
 
 
 

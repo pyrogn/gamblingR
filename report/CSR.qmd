@@ -58,20 +58,32 @@ avg_win <- p_losing * exp_losing + p_winning * exp_winning
 ### Примененная статистика
 
 -   Метод Монте-Карло для симуляций
--   T-test для оценки истинного среднего
+-   T-test для оценки среднего
 -   Test $\chi^2$ для сравнения частот дискретных распределений
--   Z-test для оценки истинной пропорции
+-   Z-test для оценки пропорции
 
 ## Strategies
 
-1.  Randy
+1.  Randy 🤪
     1.  Randomly pulls machine at every moment
-2.  Hate-to-lose man
-    1.  Plays at least 10 games at machine.
-    2.  If he loses money 3 times in a row he jumps to another random machine (or not random, where not played?)
-3.  T shaped man
-4.  Biased Bayes
-5.  Chi
+2.  Hate-to-lose man 😎
+    1.  Has 10 patience points.
+    2.  Every lose costs 1-2 patience points.
+    3.  Win restores patience points.
+    4.  If patience is depleted player jumps to another random machine.
+3.  T-man 🍵
+    1.  Builds for every machine confidence interval of expected value using T-test
+    2.  At every step chooses a random machine with weights - lower boundary of CI.
+    3.  Keeps last 50 games for every machine, so he will adapt to change of winning machine.
+4.  Conservative player 🧱
+    1.  Collects winning history from every machine.
+    2.  Finds proportion of every event and takes lower boundary using Z test for proportions.
+    3.  Plays a machine with higher expected value (how is so?).
+5.  Son of a casino designer 🤡
+    1.  Knows true distributions of winning and losing machines.
+    2.  Plays at least 10 times at every machine. Keep history of 100 games.
+    3.  Uses $\chi^2$ test for comparing current distribution of machine to the know distributions.
+    4.  Plays in a particular machine, until the machine is likely to be losing. Then moves to the next one on the right.
 
 Потенциальный выигрыш
 
@@ -80,24 +92,19 @@ avg_win <- p_losing * exp_losing + p_winning * exp_winning
 tibble(winning_sizes, w = winning_p_distr, l = losing_p_distr) |>
   mutate(one_in_w = round(1 / w)) |>
   mutate(one_in_l = round(1 / l)) |>
-  mutate(w = scales:::percent(w, accuracy = 1)) |>
-  mutate(l = scales:::percent(l, accuracy = 1)) |>
+  mutate(w = scales:::percent(w, accuracy = .1)) |>
+  mutate(l = scales:::percent(l, accuracy = .1)) |>
   select(winning_sizes, w, one_in_w, l, one_in_l) |>
   rename(`Размер награды` = winning_sizes) |>
-  kable(format = "html", align = "cll") |>
-  kable_styling(full_width = FALSE, bootstrap_options = "striped")
-# |>
-# column_spec(2, bold = T, border_right = T, format = )
-```
-
-```{r}
-#| echo: false
-2 * 2
+  kable(format = "html", align = "c") |>
+  kable_styling(full_width = FALSE, bootstrap_options = "striped") |>
+  column_spec(3, border_right = T) |> 
+  column_spec(1, border_right = T) 
 ```
 
 ## Visualization of strategies
 
-Вставить графики из plots.R
+Вставить графики из plots.R. (А где обрабатывать данные? Думаю, там же. Хотя бы первоначально.)
 
 ```{r}
 #| echo: false
@@ -116,7 +123,7 @@ cnt_function <- system("git grep -E 'function' ../R | wc -l", intern = T) |>
   as.integer()
 ```
 
-1.  You will never win in the real casino
+1.  You will never win in a real casino
 2.  Statistics is useful
 3.  Simulations are fun and cheap
 4.  Write as many functions as possible. I have `r cnt_function`, actually.

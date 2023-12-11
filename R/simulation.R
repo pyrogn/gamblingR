@@ -126,7 +126,7 @@ GameEnvironment <- R6Class("GameEnvironment",
             self$changes, list(c(private$winner, self$n))
           )
           private$last_change <- 0
-        } # лесенка прямо как в джаве
+        }
       }
     }
   )
@@ -176,42 +176,48 @@ repeate_iters <- function(strategy) {
 
 strategy1 <- function() {
   engine <- function(func) {
-    choice =
-    throwaway <- func(sample(1:n_bandits, size = 1))
+    choice <-
+      throwaway <- func(sample(1:n_bandits, size = 1))
   }
   engine
 }
 
-strip_deque = function(q, max_size) {
+strip_deque <- function(q, max_size) {
   if (q$size() > max_size) {
     q$popleft() # throwaway
   }
   return(q)
 }
 
-# play where max avg mean of winnings
+# hate-to-lose man
 strategy2 <- function() {
-  last_winnings <- map(1:n_bandits, ~ deque(rep(price, 100)))
-  engine <- function(func) {
-    avg_mean <- map_dbl(
-      map(last_winnings, ~ .x$as_list() |> unlist()),
-      mean
-    )
-    # print(avg_mean)
-    to_pull <- which.max(avg_mean)
-    result <- func(to_pull)
+  patience_level <- 10
+  to_pull <- sample(1:n_bandits, size = 1)
 
-    last_winnings[[to_pull]]$push(result)
-    last_winnings[[to_pull]]$popleft()
+  engine <- function(func) {
+    result <- func(to_pull)
+    if (result < price) {
+      patience_level <<- patience_level - (1 - result / price) * 2
+    } else {
+      patience_level <<- 10
+    }
+
+    if (patience_level <= 0) {
+      sample_from <- 1:n_bandits
+      sample_from <- sample_from[sample_from != to_pull]
+      to_pull <<- sample(1:n_bandits, size = 1)
+    }
   }
   engine
 }
 
-# maybe add different alpha in t statistics
-# t stat
+# t-test for expected value
 strategy3 <- function() {
   get_lower_boundary <- function(x) {
-    t.test(x, mu = price, alternative = "greater")$conf.int[[1]]
+    t.test(x,
+      mu = price, alternative = "greater",
+      conf.level = .5 # чтобы чуть сузить интервалы
+    )$conf.int[[1]]
   }
 
   lower_boundaries <- rep(9.8, n_bandits)
@@ -225,17 +231,13 @@ strategy3 <- function() {
       mean
     )
     p <- lower_boundaries |> softmax()
-    if (sample(1:4, size = 1) == 1) { # random strategy
-      to_pull <- sample(1:n_bandits, size = 1)
-    } else { # intelligent strategy
-      to_pull <- sample(1:n_bandits, p = p, size = 1)
-    }
+    to_pull <- sample(1:n_bandits, p = p, size = 1)
     result <- pull_func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
-    if (last_winnings[[to_pull]]$size() > max_history) {
-      last_winnings[[to_pull]]$popleft()
-    }
+    last_winnings[[to_pull]] <-
+      strip_deque(last_winnings[[to_pull]], max_history)
+
     lower_boundaries[[to_pull]] <<- last_winnings[[to_pull]]$as_list() |>
       unlist() |>
       get_lower_boundary()
@@ -243,47 +245,53 @@ strategy3 <- function() {
   engine
 }
 
-# sequential player
+# conservative player
 strategy4 <- function() {
-  get_higher_boundary <- function(x) {
-    t.test(x, mu = price)$conf.int[[2]]
+  conservative_exp <- function(vec) {
+    size <- length(vec)
+    t <- table(vec)
+    table_names <- names(t)
+    sum_rewards <- 0
+    pp <- 0 # для нормализации вероятностей
+    for (i in seq_along(t)) {
+      test <- prop.test(
+        t[[i]], size,
+        conf.level = .9, alternative = "two.sided"
+      )
+      pp <- pp + test$conf.int[[1]]
+      sum_rewards <- sum_rewards +
+        test$conf.int[[1]] * as.integer(table_names[[i]])
+    }
+    return(sum_rewards * (1 / pp))
   }
 
-  higher_boundaries <- rep(9.8, n_bandits)
+  exp_values <- rep(1, n_bandits)
 
-  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2))) # var != 0
-  max_history <- 50
+  last_winnings <- map(1:n_bandits, ~ deque(c(9.8, 10.2)))
+  max_history <- 100
   to_pull <- 1
 
   engine <- function(pull_func) {
+    p <- exp_values |> softmax()
     result <- pull_func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
-    if (last_winnings[[to_pull]]$size() > max_history) {
-      last_winnings[[to_pull]]$popleft()
-    }
+    last_winnings[[to_pull]] <-
+      strip_deque(last_winnings[[to_pull]], max_history)
 
-    higher_boundaries[[to_pull]] <<- last_winnings[[
-      to_pull
-    ]]$as_list() |>
-      unlist() |>
-      get_higher_boundary()
-
-    # print(higher_boundaries)
-
-    if (higher_boundaries[[to_pull]] < price) {
+    exp_values[[to_pull]] <- conservative_exp(
+      last_winnings[[to_pull]]$as_list() |> unlist()
+    )
+    if (exp_values[[to_pull]] < 7) { # think how to not hardcode
       to_pull <<- (to_pull) %% n_bandits + 1
     }
   }
   engine
 }
 
-# chi squared player
-strategy5 <- function() {
-  # get_higher_boundary <- function(x) {
-  #   t.test(x, mu = price)$conf.int[[2]]
-  # }
 
+# cheater
+strategy5 <- function() {
   get_info <- function(vec) {
     vec_fac <- factor(vec, levels = winning_sizes)
     data <- list()
@@ -305,19 +313,10 @@ strategy5 <- function() {
     result <- pull_func(to_pull)
 
     last_winnings[[to_pull]]$push(result)
-    if (last_winnings[[to_pull]]$size() > max_history) {
-      last_winnings[[to_pull]]$popleft()
-    }
-
-    # higher_boundaries[[to_pull]] <<- last_winnings[[
-    #   to_pull
-    # ]]$as_list() |>
-    #   unlist() |>
-    #   get_higher_boundary()
+    last_winnings[[to_pull]] <-
+      strip_deque(last_winnings[[to_pull]], max_history)
 
     data <- get_info(last_winnings[[to_pull]]$as_list())
-
-    # print(higher_boundaries)
 
     if ((last_winnings[[to_pull]]$size() >= 10) &
       (data$p_los > data$p_win)) {
@@ -330,7 +329,7 @@ strategy5 <- function() {
 
 # write strategy based on Bayesian statistics
 
-# plays generation ---------------------------------------------------
+# for debug purposes -----------------------------------------------
 
 # These fns defined in plots.R, delete it after stabilization
 get_attr_data <- function(data, attribute) {
@@ -344,15 +343,16 @@ get_rewards_simulations <- function(data) {
 # for debug purposes:
 
 # g <- GameEnvironment$new(n_steps)
-# str1 <- strategy5()
+# str1 <- strategy4()
 # pull_ <- init_pull_bandit_player(g)
-# walk(1:10, ~ str1(pull_))
+# walk(1:100, ~ str1(pull_))
 
 # it1 <- run_iter(strategy5)
 # I feel uneasy that strategy can call pull more than once per step
+
+
+# it100 <- repeate_iters(strategy4)
 #
-# it100 <- repeate_iters(strategy5)
-# #
 # r1 <- get_rewards_simulations(it100)
 # map_dbl(r1, mean)
 # map_dbl(r1, mean) |> mean()
