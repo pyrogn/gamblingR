@@ -12,6 +12,7 @@ library(tidyverse)
 library(kableExtra)
 library(knitr)
 source("../R/constants.R")
+source("../R/plots.R")
 ```
 
 ## CSR (Casino Strategies Report)
@@ -20,10 +21,10 @@ source("../R/constants.R")
 
 ## What is this about
 
-1.  Code As Much As You Can (**functional** code and **tidyverse style** where is possible). A little bit of OOP with R6 classes.
+1.  Code. **Functional** code and **tidyverse style** where is possible. A bit of OOP with R6 classes.
 2.  Game simulation and **data wrangling**.
 3.  Creating different gaming strategies using common sense and **statistics**.
-4.  Finding best strategy backed by statistics. (monte carlo + estimation).
+4.  Finding best strategy by Monte Carlo simulation and Law of Large Numbers.
 5.  **Data Visualization** of metrics by different strategies using **ggplot2**.
 6.  **Results presentations** with Quarto.
 7.  Project management using **git, GitHub, renv**.
@@ -78,7 +79,7 @@ avg_win <- p_losing * exp_losing + p_winning * exp_winning
 4.  Conservative player 🧱
     1.  Collects winning history from every machine.
     2.  Finds proportion of every event and takes lower boundary using Z test for proportions.
-    3.  Plays a machine with higher expected value (how is so?).
+    3.  Plays a machine until its adjusted expected value is less than 7.
 5.  Son of a casino designer 🤡
     1.  Knows true distributions of winning and losing machines.
     2.  Plays at least 10 times at every machine. Keep history of 100 games.
@@ -104,16 +105,39 @@ tibble(winning_sizes, w = winning_p_distr, l = losing_p_distr) |>
 
 ## Visualization of strategies
 
-Вставить графики из plots.R. (А где обрабатывать данные? Думаю, там же. Хотя бы первоначально.)
-
-```{r}
+```{r, fig.asp=0.5, fig.width=8}
 #| echo: false
-# 1+1
+plot_left_on_step(rewards_at_step)
 ```
+
+And two more plots on machine choice
 
 ## Best strategy
 
-Оценить матожидание
+Матожидание выигрыша от игры
+```{r}
+#| echo: false
+profit_ci |>
+  mutate_strategy() |>
+  arrange(-mean) |>
+  mutate(across(c(mean, lb, hb), ~ round(., 3))) |> 
+  mutate(
+    string = str_c(
+      mean,
+      " [", lb,
+      "; ", hb,
+      "]"
+      )
+    ) |>
+  select(strategy, mean, lb, hb, string) |> 
+  kable(format = "html", align = "c")
+```
+
+
+```{r, fig.asp=0.3, fig.width=8}
+#| echo: false
+plot_expected_profit(profit_ci)
+```
 
 ## Conclusions
 

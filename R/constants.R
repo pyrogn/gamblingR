@@ -25,7 +25,8 @@ winning_sizes <- c(
 )
 
 # where to store data from simulations
-name_strategy <- function(x) paste0("data/s", x, ".RData")
+repo_path = "/Users/pyro/R/gamblingR/"
+name_strategy <- function(x) paste0(repo_path, "data/s", x, ".RData")
 
 # validations
 exp_losing <- sum(losing_p_distr * winning_sizes)

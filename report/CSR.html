@@ -84,10 +84,10 @@ ul.task-list li input[type="checkbox"] {
 <section id="what-is-this-about" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-this-about">What is this about</h2>
 <ol type="1">
-<li>Code As Much As You Can (<strong>functional</strong> code and <strong>tidyverse style</strong> where is possible). A little bit of OOP with R6 classes.</li>
+<li>Code. <strong>Functional</strong> code and <strong>tidyverse style</strong> where is possible. A bit of OOP with R6 classes.</li>
 <li>Game simulation and <strong>data wrangling</strong>.</li>
 <li>Creating different gaming strategies using common sense and <strong>statistics</strong>.</li>
-<li>Finding best strategy backed by statistics. (monte carlo + estimation).</li>
+<li>Finding best strategy by Monte Carlo simulation and Law of Large Numbers.</li>
 <li><strong>Data Visualization</strong> of metrics by different strategies using <strong>ggplot2</strong>.</li>
 <li><strong>Results presentations</strong> with Quarto.</li>
 <li>Project management using <strong>git, GitHub, renv</strong>.</li>
@@ -148,7 +148,7 @@ ul.task-list li input[type="checkbox"] {
 <ol type="1">
 <li>Collects winning history from every machine.</li>
 <li>Finds proportion of every event and takes lower boundary using Z test for proportions.</li>
-<li>Plays a machine with higher expected value (how is so?).</li>
+<li>Plays a machine until its adjusted expected value is less than 7.</li>
 </ol></li>
 <li>Son of a casino designer 🤡
 <ol type="1">
@@ -223,11 +223,75 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="visualization-of-strategies" class="level2">
 <h2 class="anchored" data-anchor-id="visualization-of-strategies">Visualization of strategies</h2>
-<p>Вставить графики из plots.R. (А где обрабатывать данные? Думаю, там же. Хотя бы первоначально.)</p>
+<div class="cell" data-fig.asp="0.5">
+<div class="cell-output-display">
+<p><img src="CSR_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<p>And two more plots on machine choice</p>
 </section>
 <section id="best-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="best-strategy">Best strategy</h2>
-<p>Оценить матожидание</p>
+<p>Матожидание выигрыша от игры</p>
+<div class="cell">
+<div class="cell-output-display">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: center;" data-quarto-table-cell-role="th">strategy</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">lb</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">hb</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">string</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Cheater</td>
+<td style="text-align: center;">1.318</td>
+<td style="text-align: center;">0.816</td>
+<td style="text-align: center;">1.819</td>
+<td style="text-align: center;">1.318 [0.816; 1.819]</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">NotLoser</td>
+<td style="text-align: center;">0.936</td>
+<td style="text-align: center;">0.384</td>
+<td style="text-align: center;">1.488</td>
+<td style="text-align: center;">0.936 [0.384; 1.488]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Conservative</td>
+<td style="text-align: center;">0.925</td>
+<td style="text-align: center;">0.316</td>
+<td style="text-align: center;">1.534</td>
+<td style="text-align: center;">0.925 [0.316; 1.534]</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">T-man</td>
+<td style="text-align: center;">0.268</td>
+<td style="text-align: center;">-0.326</td>
+<td style="text-align: center;">0.863</td>
+<td style="text-align: center;">0.268 [-0.326; 0.863]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Randy</td>
+<td style="text-align: center;">-0.810</td>
+<td style="text-align: center;">-1.277</td>
+<td style="text-align: center;">-0.344</td>
+<td style="text-align: center;">-0.81 [-1.277; -0.344]</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell" data-fig.asp="0.3">
+<div class="cell-output-display">
+<p><img src="CSR_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
@@ -235,7 +299,7 @@ ul.task-list li input[type="checkbox"] {
 <li>You will never win in a real casino</li>
 <li>Statistics is useful</li>
 <li>Simulations are fun and cheap</li>
-<li>Write as many functions as possible. I have 41, actually.</li>
+<li>Write as many functions as possible. I have 42, actually.</li>
 </ol>
 </section>
 

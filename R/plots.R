@@ -1,9 +1,11 @@
-styler:::style_active_file()
+# styler:::style_active_file()
 
 library(tidyverse)
 library(ggridges)
 library(slider)
-source("R/constants.R")
+library(ggrepel)
+# cannot use relative path because of qmd file
+source("/Users/pyro/R/gamblingR/R/constants.R")
 
 # Выглядит очень страшно, и это тяжело читать. И редактировать.
 # Есть идеи, как можно было бы это упростить.
@@ -32,10 +34,7 @@ get_index_simulations <- function(data) {
 sim_rewards <- map(sim_data, get_rewards_simulations)
 sim_ind <- map(sim_data, get_index_simulations)
 
-# changes shouldn't be unlist
-# map(sim_data, ~ get_attr_data(.x, "changes"))
-
-cash_revenue <- sim_rewards |>
+cash_profit <- sim_rewards |>
   map_depth(2, sum) |>
   map_depth(1, unlist) |>
   map(\(x) x - price * n_steps) |>
@@ -80,48 +79,94 @@ n_bankrupt_at_step <- bankrupt_at_step |>
   ungroup()
 
 
+mutate_strategy <- function(df) {
+  df |>
+    mutate(strategy=
+    factor(
+      strategy,
+      lab = c("Randy", "NotLoser", "T-man", "Conservative", "Cheater")
+    ))
+}
 
 # plots ----------------------------------------------------
 
 # Найти также из этого графика среднее и sd!
 
 # Остаток на балансе под конец игры
-plot_end_cash <- function(cash_left) {
-  ggplot(cash_revenue, aes(x = x, y = strategy, fill = strategy)) +
-    geom_boxplot() +
-    theme_minimal()
+
+profit_ci = cash_profit |>
+  mutate(x = x / n_steps) |>
+  group_by(strategy) |>
+  summarize(
+    mean=mean(x),
+    se = sd(x) / sqrt(n()),
+    n=n()
+  ) |>
+  mutate(delta_ci = qt(0.975, df=n)*se) |> # alpha=95%
+  mutate(lb = mean-delta_ci,
+         hb = mean+delta_ci)
+
+
+
+plot_expected_profit <- function(profit_ci) {
+
+  profit_ci |>
+    mutate_strategy() |>
+    ggplot(aes(y=strategy, x=mean, group=strategy)) +
+    geom_errorbarh(aes(xmin=lb, xmax=hb)) +
+    labs(x='Средняя прибыль за 1 игру', y='Стратегия'
+         ,title='Сравнение матожидания прибыли от игры') +
+    theme_minimal() +
+    scale_x_continuous(breaks=seq(-2, 2, .2)) +
+    geom_vline(xintercept=0, color='red', alpha=0.8)
 }
-plot_end_cash(cash_revenue)
+
+plot_expected_profit(profit_ci)
+
+
 
 
 # Остаток на балансе в ходе игры
 plot_left_on_step <- function(detail_wins) {
-  ggplot(data = detail_wins, aes(
-    x = x, y = y, color = strategy, group = strategy
+  detail_wins |>
+    mutate_strategy() |>
+    mutate(label = as.character(strategy)) |>
+  ggplot(aes(
+    x = x, y = y, color = strategy, group=strategy
   )) +
-    geom_line() +
-    theme_minimal()
+    geom_line(size=1) +
+    labs(x = "Шаг", y = "Накопленная прибыль",
+         title = 'Оценка накопления прибыли в процессе игры') +
+    coord_cartesian(xlim = c(0, n_steps)) +
+    theme_minimal() +
+    geom_hline(yintercept = 0, color='black', linetype='dotted')
+  # + # пока что не работает
+  # geom_label_repel(aes(label = label),
+  #                  nudge_x = 1,
+  #                  na.rm = TRUE)
 }
 plot_left_on_step(rewards_at_step)
+
 
 # Процент банкротов на определенном шаге
 
 n_bankrupt_at_step |>
+  mutate_strategy() |>
   ggplot(aes(x = step, y = prop, color = strategy)) +
   geom_line() +
   theme_minimal() +
   labs(
     y = "Процент банкротов на шаге",
-    x = "Шаг"
+    x = "Шаг",
+    title='Скорость банкротства'
   ) +
   scale_y_continuous(labels = scales::percent)
 
 
 
-
-
 # Про индексы и специфику выбора
 
+# Процент использования нужной машины до смены и после смены
 
 # создание датафрейма с индексом и шагом (уфффф...--0[_32][}{}])
 get_hits_on_position <- function(data) {
@@ -170,17 +215,16 @@ get_hits_on_position <- function(data) {
 
 
 
-position_hits_list = sim_data |>
-  map(~map_dfr(., get_hits_on_position) |>
-        group_by(position_look) |>
-        summarize(prop_hit = sum(target_hit)/sum(n))
-      ) |>
-  suppressMessages()
-
-position_hits_list |>
-bind_rows(.id='strategy') |>
-  ggplot(aes(x=position_look, y=prop_hit, color=strategy)) +
-  geom_line()
+# position_hits_list <- sim_data |>
+#   map(~ map_dfr(., get_hits_on_position) |>
+#     group_by(position_look) |>
+#     summarize(prop_hit = sum(target_hit) / sum(n))) |>
+#   suppressMessages()
+#
+# position_hits_list |>
+#   bind_rows(.id = "strategy") |>
+#   ggplot(aes(x = position_look, y = prop_hit, color = strategy)) +
+#   geom_line()
 
 
 # Добавить график с дисперсией выбора
@@ -195,25 +239,15 @@ uniq_elems_slide <- function(vec) {
   )
 }
 
-uniq_ind_data = sim_ind |>
+uniq_ind_data <- sim_ind |>
   map_depth(2, uniq_elems_slide) |>
   map(transpose) |>
   map_depth(2, unlist) |>
   map_depth(2, mean) |>
   map_depth(1, unlist) |>
-  map(~ tibble(average_lookout=.) |> mutate(step=row_number())) |>
-  bind_rows(.id='strategy')
+  map(~ tibble(average_lookout = .) |> mutate(step = row_number())) |>
+  bind_rows(.id = "strategy")
 
-uniq_ind_data |>
-  ggplot(aes(x=step, y=average_lookout, color=strategy)) +
-  geom_line()
-
-
-
-# make inner join and use target index from 1 table
-# add column - steps to change: -3,-2,-1,0,1,2,3... Some may be NA
-# map to many iterations (HOW?)
-# group by delta, summarize mean
-# plot it as lineplot probably. Or maybe something with CI.
-
-# Процент использования нужной машины до смены и после смены
+# uniq_ind_data |>
+#   ggplot(aes(x = step, y = average_lookout, color = strategy)) +
+#   geom_line()
