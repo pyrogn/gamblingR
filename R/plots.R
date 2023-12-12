@@ -184,7 +184,7 @@ plot_bankrupcy <- function(n_bankrupt_at_step) {
     ) +
     scale_y_continuous(labels = scales::percent) +
     geom_label_repel(aes(label = label),
-      nudge_x = 50,
+      nudge_x = 70,
       na.rm = TRUE
     ) +
     scale_color_discrete(guide = FALSE)
@@ -216,12 +216,14 @@ get_hits_on_position <- function(data) {
     rowwise() |>
     mutate(
       rel_position = if_else(
-        pos_lookup < -neg_lookup, pos_lookup, neg_lookup
+        neg_lookup >= -30,
+        neg_lookup,
+        pos_lookup
       )
     ) |>
     ungroup() |>
-    mutate(position_look = if_else( # maybe edit position
-      -30 <= rel_position & rel_position <= 300,
+    mutate(position_look = if_else( # a bit of hardcode
+      -30 <= rel_position & rel_position <= 450,
       rel_position, NA
     )) |>
     filter(!is.na(position_look)) |>
@@ -259,7 +261,7 @@ plot_hitting_target <- function(position_hits_df) {
     geom_vline(xintercept = 0, linewidth = 1, color = "red") +
     theme_minimal() +
     scale_y_continuous(labels = scales::percent) +
-    scale_x_continuous(breaks = seq(-200, 300, 20)) +
+    scale_x_continuous(breaks = seq(-200, 450, 50)) +
     labs(
       x = "Relative step to winning machine change",
       y = "Proportion hits to winning machine",
@@ -276,7 +278,7 @@ uniq_elems_slide <- function(vec) {
     \(x) x |>
       unique() |>
       length(),
-    .before = 10, .after = 10
+    .before = 15, .after = 15
   )
 }
 
@@ -298,7 +300,7 @@ plot_machine_diversity <- function(uniq_ind_data) {
     labs(
       x = "Step",
       title = TeX(glue(
-        "Machines diversity in step $\\pm$ 10 steps"
+        "Machines diversity in step $\\pm$ 15 steps"
       )),
       y = "Avg number of machines"
     ) +

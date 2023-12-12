@@ -107,6 +107,7 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 <section id="basic-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="basic-statistics">Basic statistics</h2>
 <ul>
+<li>Player has 300 money.</li>
 <li>Game price: 10.</li>
 <li>Expected profit of losing machine: 8.88.</li>
 <li>Expected profit of winning machine: 12.94.</li>
@@ -136,20 +137,20 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 <ul>
 <li>Has 10 patience points.</li>
 <li>Every lose costs 1-2 patience points.</li>
-<li>Win restores patience points.</li>
+<li>A win restores patience points.</li>
 <li>If patience is depleted player jumps to another random machine.</li>
 </ul></li>
-<li>T-man 🍵
+<li>T-man 🫖
 <ul>
 <li>Builds for every machine confidence interval of expected value using T-test</li>
-<li>At every step chooses a random machine with weights - lower boundary of CI.</li>
+<li>At every step chooses a random machine with weights equal to lower boundary of CI of expected value.</li>
 <li>Keeps last 50 games for every machine, so he will adapt to change of winning machine.</li>
 </ul></li>
-<li>Conservative player 🧱
+<li>Conservative player 🐌
 <ul>
 <li>Collects winning history from every machine.</li>
 <li>Finds proportion of every event and takes lower boundary using Z test for proportions.</li>
-<li>Plays a machine until its adjusted expected value is less than 7.</li>
+<li>Plays a machine until its adjusted expected value is less than 7 (heuristics).</li>
 </ul></li>
 <li>Son of a casino designer 🤡
 <ul>
@@ -229,7 +230,7 @@ We create strategies to play maximizing profit and evaluate their efficiency.</p
 <p><img src="CSR_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
-<div class="cell" data-fig.asp="0.5">
+<div class="cell" data-fig.asp="0.8">
 <div class="cell-output-display">
 <p><img src="CSR_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="768"></p>
 </div>

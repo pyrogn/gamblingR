@@ -51,6 +51,7 @@ p_winning <- 1 / n_bandits
 avg_win <- p_losing * exp_losing + p_winning * exp_winning
 ```
 
+-   Player has `r cash` money.
 -   Game price: `r price`.
 -   Expected profit of losing machine: `r exp_losing |> round(2)`.
 -   Expected profit of winning machine: `r exp_winning |> round(2)`.
@@ -73,16 +74,16 @@ avg_win <- p_losing * exp_losing + p_winning * exp_winning
 -   Hate-to-lose man 😎
     -   Has 10 patience points.
     -   Every lose costs 1-2 patience points.
-    -   Win restores patience points.
+    -   A win restores patience points.
     -   If patience is depleted player jumps to another random machine.
--   T-man 🍵
+-   T-man 🫖
     -   Builds for every machine confidence interval of expected value using T-test
-    -   At every step chooses a random machine with weights - lower boundary of CI.
+    -   At every step chooses a random machine with weights equal to lower boundary of CI of expected value.
     -   Keeps last 50 games for every machine, so he will adapt to change of winning machine.
--   Conservative player 🧱
+-   Conservative player 🐌
     -   Collects winning history from every machine.
     -   Finds proportion of every event and takes lower boundary using Z test for proportions.
-    -   Plays a machine until its adjusted expected value is less than 7.
+    -   Plays a machine until its adjusted expected value is less than 7 (heuristics).
 -   Son of a casino designer 🤡
     -   Knows true distributions of winning and losing machines.
     -   Plays at least 10 times at every machine. Keep history of 100 games.
@@ -113,7 +114,7 @@ tibble(winning_sizes, w = winning_p_distr, l = losing_p_distr) |>
 plot_left_on_step(rewards_at_step)
 ```
 
-```{r, fig.asp=0.5, fig.width=8, warning=FALSE}
+```{r, fig.asp=0.8, fig.width=8, warning=FALSE}
 #| echo: false
 plot_bankrupcy(n_bankrupt_at_step)
 ```
