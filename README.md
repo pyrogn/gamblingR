@@ -11,6 +11,12 @@
 2.  Run [R/simulation.R](R/simulation.R) to generate new random data. Edit [R/constants.R](R/constants.R) to change simulation parameters.
 3.  Render [report/CSR.qmd](report/CSR.qmd) into html
 
+## Bonus (WIP)
+
+**warning**: large stdout!!! Be on guard.
+
+1.  Run `Rscript bonus/bonus.R`
+
 ## TODO
 
 Important:
