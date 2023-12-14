@@ -66,8 +66,9 @@ for (i in 1:30) {
     str_c('\n') |>
     str_flatten()
 
-  system('clear') # might flicker
-  cat(c(newlines, final_res))
+  # system('clear') # might flicker
+  to_cat = c(newlines, final_res)
+  cat(to_cat)
   Sys.sleep(.3)
 }
 
