@@ -3,12 +3,11 @@ library(stringr)
 library(purrr)
 library(cli)
 
-# Код пока что очень некрасивый
-
 tree_orig <- read_file("bonus/tree.txt")
 
 splitted_tree <- str_split(tree_orig, "\n")[[1]]
 
+# делим дерево на ветви и ствол
 is_top <- splitted_tree |>
   map_lgl(~ str_detect(., pattern = "\\*"))
 
